@@ -2,7 +2,7 @@ import { notification } from "antd";
 
 import proxy from "@/js-sdk/native/proxy-core";
 
-import proxyCfg from "./proxy";
+import proxyCfg from "./proxyCfg";
 
 import axios from "axios";
 

@@ -32,6 +32,7 @@
     "yorkie": "^2.0.0"
   },
   "devDependencies": {
+    "@types/styled-components": "^5.1.3",
     "@umijs/preset-react": "^1.6.8",
     "cross-env": "^7.0.2"
   }

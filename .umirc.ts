@@ -1,10 +1,22 @@
-import { defineConfig } from 'umi';
+import { defineConfig } from "umi";
+import theme from "./src/theme/";
 
 export default defineConfig({
   nodeModulesTransform: {
-    type: 'none',
+    type: "none",
   },
   routes: [
-    { path: '/', component: '@/pages/index' },
+    {
+      path: "/",
+      component: "@/layouts/",
+      routes: [
+        { path: "/", redirect: "/record/" },
+        { path: "/record/", component: "record" },
+        { path: "/statistic/", component: "statistic" },
+        { path: "/user/", component: "user" },
+        { redirect: "/record/" },
+      ],
+    },
   ],
+  theme,
 });
