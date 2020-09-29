@@ -8,6 +8,12 @@ import axios from "axios";
 
 import type { AxiosResponse, AxiosRequestConfig, Method } from "axios";
 
+declare global {
+  interface Window {
+    routerBase?: "string";
+  }
+}
+
 class BizError extends Error {
   response?: AxiosResponse;
 }
@@ -101,7 +107,8 @@ function request(url: string, options: BizOptions = {}) {
 
     if (response?.status === 401 && reAuth) {
       notification.error({ message: "请重新登录" });
-      location.replace("/#/login/");
+      localStorage.clear();
+      location.replace(`${window.routerBase}/user/`);
       return;
       // return reAuthorization();
     }

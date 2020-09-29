@@ -19,4 +19,6 @@ export default defineConfig({
     },
   ],
   theme,
+  hash: true,
+  base: "/time-mgt",
 });
