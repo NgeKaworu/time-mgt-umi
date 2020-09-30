@@ -1,6 +1,6 @@
 import { ModalSchma } from "@/models/global";
 import { ObjectId } from "@/utils/type";
-
+import { RESTful } from "@/http";
 export interface UserSchema {
   _id?: ObjectId;
   name?: string;
@@ -23,12 +23,44 @@ const UserModal: ModalSchma = {
     },
   },
   effects: {
-    *profile({ payload }, { put }) {
+    *profile(_, { put }) {
+      const { data } = yield RESTful.get(
+        "/main/profile",
+        { silence: "success" },
+      );
+      yield put({ type: "save", payload: data });
+    },
+    *login({ payload }) {
+      const { data } = yield RESTful.post("/main/login", { data: payload });
+      localStorage.setItem("token", data);
+    },
+    *register({ payload }) {
+      const { data } = yield RESTful.post("/main/register", { data: payload });
+      localStorage.setItem("token", data);
+    },
+    *logout(_, { put }) {
+      yield put({
+        type: "save",
+        payload: {
+          _id: undefined,
+          name: undefined,
+          email: undefined,
+          createAt: undefined,
+        },
+      });
+      localStorage.clear();
+      location.replace(`${window.routerBase}/user/`);
     },
   },
   subscriptions: {
     setup({ history, dispatch }): void {
       // Subscribe history(url) change, trigger `load` action if pathname is `/`
+      if (
+        history.location.pathname.includes("/user") &&
+        !localStorage.getItem("token")
+      ) {
+        return;
+      }
       dispatch({ type: "profile" });
     },
   },

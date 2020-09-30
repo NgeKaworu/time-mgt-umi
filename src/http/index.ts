@@ -72,7 +72,7 @@ function request(url: string, options: BizOptions = {}) {
     // 超时
     timeout: 10000,
     headers: {
-      Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      Authorization: `${localStorage.getItem("token")}`,
       ...headers,
     },
   };
@@ -106,9 +106,14 @@ function request(url: string, options: BizOptions = {}) {
     // reAuth标记是用来防止连续401的熔断处理
 
     if (response?.status === 401 && reAuth) {
-      notification.error({ message: "请重新登录" });
-      localStorage.clear();
-      location.replace(`${window.routerBase}/user/`);
+      notification.error({
+        message: "请先登录",
+        onClose: () => {
+          localStorage.clear();
+          location.replace(`${window.routerBase}/user/`);
+        },
+      });
+
       return;
       // return reAuthorization();
     }

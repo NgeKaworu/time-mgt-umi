@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useHistory } from "react-router-dom";
 import { UserSchema } from "./model";
 import { Form, Input, Button, Space } from "antd";
 import { MailOutlined, LockOutlined, UserOutlined } from "@ant-design/icons";
@@ -19,6 +20,7 @@ const Wrap = styled.div`
 
 export default () => {
   const dispatch = useDispatch();
+  const history = useHistory();
   const {
     name,
     email,
@@ -34,8 +36,14 @@ export default () => {
     }
   }, [flag, email]);
 
-  const onFinish = (values: UserSchema) => {
-    console.log("Received values of form: ", values);
+  const onFinish = async (values: UserSchema) => {
+    try {
+      await dispatch({ type: `user/${curStatus}`, payload: values });
+      await dispatch({ type: "user/profile" });
+      history.push("/record");
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const stateMap: Record<string, any> = {
