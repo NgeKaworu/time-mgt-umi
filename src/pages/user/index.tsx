@@ -49,7 +49,7 @@ export default () => {
   const stateMap: Record<string, any> = {
     login: "登录",
     register: "注册",
-    logined: "欢迎",
+    logined: "欢迎回来",
   };
 
   return (

@@ -1,4 +1,4 @@
-import { notification } from "antd";
+import { message } from "antd";
 
 import proxy from "@/js-sdk/native/proxy-core";
 
@@ -95,7 +95,7 @@ function request(url: string, options: BizOptions = {}) {
   function successHandler(response: AxiosResponse) {
     const { data } = response;
     if (!(silence === true || silence === "success")) {
-      notification.success({ message: data?.message || "操作成功" });
+      message.success({ content: data?.message || "操作成功" });
     }
     return data;
   }
@@ -106,8 +106,8 @@ function request(url: string, options: BizOptions = {}) {
     // reAuth标记是用来防止连续401的熔断处理
 
     if (response?.status === 401 && reAuth) {
-      notification.error({
-        message: "请先登录",
+      message.warning({
+        content: "请先登录",
         onClose: () => {
           localStorage.clear();
           location.replace(`${window.routerBase}/user/`);
@@ -121,8 +121,8 @@ function request(url: string, options: BizOptions = {}) {
     if (!(silence === true || silence === "fail")) {
       const timeoutMsg = eMsg.match("timeout") && "连接超时， 请检查网络。";
 
-      notification.error({
-        message:
+      message.error({
+        content:
           // 超时
           timeoutMsg ||
           // 后端业务错误
