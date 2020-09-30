@@ -8,6 +8,11 @@ import styled from "styled-components";
 
 interface RootState {
   user: UserSchema;
+  loading: {
+    models: {
+      user?: boolean;
+    };
+  };
 }
 
 const Wrap = styled.div`
@@ -22,9 +27,15 @@ export default () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const {
-    name,
-    email,
-  } = useSelector((state: RootState) => state.user);
+    user: {
+      name,
+      email,
+    },
+    isLoading,
+  } = useSelector((state: RootState) => ({
+    user: state.user,
+    isLoading: state?.loading?.models?.user,
+  }));
 
   const [flag, setFlag] = useState("login");
 
@@ -116,6 +127,7 @@ export default () => {
           </Form.Item>
           <Form.Item>
             <Button
+              loading={isLoading}
               type="primary"
               htmlType="submit"
             >
