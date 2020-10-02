@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "start": "cross-env NODE_ENV=dev umi dev",
+    "start": "cross-env NODE_ENV=dev PORT=8001 umi dev",
     "build": "cross-env NODE_ENV=prod umi build",
     "postinstall": "umi generate tmp",
     "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@ant-design/pro-layout": "^5.0.12",
+    "@types/requestidlecallback": "^0.3.1",
     "@umijs/test": "^3.2.22",
     "axios": "^0.20.0",
     "lint-staged": "^10.0.7",

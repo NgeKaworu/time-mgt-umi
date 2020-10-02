@@ -9,13 +9,13 @@ import {
 } from "@ant-design/icons";
 import { useLocation, useHistory } from "react-router";
 
-const Wrap = styled.div`
+export const BottomFixPanel = styled.div`
     height:100%;
     display: flex;
     flex-direction: column;
 `;
 
-const ViewArea = styled.section`
+export const FillScrollPart = styled.section`
     height: 100%;
     flex: 1;
     overflow-y: scroll;
@@ -66,10 +66,10 @@ const menu = [
 export default (props: PropsWithChildren<any>) => {
   const { pathname } = useLocation();
   const history = useHistory();
-  return <Wrap>
-    <ViewArea>
+  return <BottomFixPanel>
+    <FillScrollPart>
       {props.children}
-    </ViewArea>
+    </FillScrollPart>
     <BottomMenu>
       {menu.map((i) =>
         <MenuItem
@@ -82,5 +82,5 @@ export default (props: PropsWithChildren<any>) => {
         </MenuItem>
       )}
     </BottomMenu>
-  </Wrap>;
+  </BottomFixPanel>;
 };
