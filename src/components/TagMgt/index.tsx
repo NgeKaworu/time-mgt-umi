@@ -3,17 +3,32 @@ import { useDispatch, useSelector } from "react-redux";
 
 import styled from "styled-components";
 
-import { Tag } from "antd";
+import { Tag, Spin } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
 import TagExec from "./TagExec";
+import type { TagSchema } from "@/models/tag";
+
+interface rootState {
+  loading: {
+    models: {
+      tag: boolean;
+    };
+  };
+  tag: {
+    tags: TagSchema[];
+  };
+}
 
 const CusTag = styled(Tag)`
     margin-top: 6px;
 `;
 
 export default function TagMgt() {
-  // const {} = useSelector(() => {});
+  const { list, loading } = useSelector((s: rootState) => ({
+    list: s.tag.tags,
+    loading: s.loading.models.tag,
+  }));
   const tagExec = TagExec();
   const dispatch = useDispatch();
   useLayoutEffect(() => {
@@ -76,13 +91,20 @@ export default function TagMgt() {
     }).Execute();
   }
 
-  return <div>
+  return <Spin spinning={loading}>
     <CusTag
       style={{ borderStyle: "dashed", background: "#fff" }}
       onClick={openCreateExec}
     >
       <PlusOutlined /> 新增标签
     </CusTag>
-    <CusTag color="purple">purple</CusTag>
-  </div>;
+    {list.map(({ _id, color, name }) =>
+      <CusTag
+        key={_id.$oid}
+        color={color}
+      >
+        {name}
+      </CusTag>
+    )}
+  </Spin>;
 }
