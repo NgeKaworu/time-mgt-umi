@@ -10,7 +10,6 @@ export interface UserSchema {
 }
 
 const UserModal: ModalSchma = {
-  namespace: "user",
   state: {
     _id: undefined,
     name: undefined,

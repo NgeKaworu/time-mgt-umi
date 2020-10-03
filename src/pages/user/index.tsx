@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { UserSchema } from "./model";
+import { UserSchema } from "@/models/user";
 import { Form, Input, Button, Space } from "antd";
 import { MailOutlined, LockOutlined, UserOutlined } from "@ant-design/icons";
 import styled from "styled-components";
