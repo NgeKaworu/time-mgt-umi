@@ -1,12 +1,10 @@
-import React, { cloneElement } from "react";
+import React, { cloneElement, useEffect } from "react";
 import type { Attributes, ReactNode } from "react";
 
-import { Form, Modal, Button, Input, ConfigProvider } from "antd";
+import { Form, Modal, Button, Input } from "antd";
 
 import Executer from "@/js-sdk/web/react/components/Executer";
 import { SketchPicker } from "react-color";
-
-import zhCN from "antd/es/locale/zh_CN";
 
 export interface TagProp {
   onOk?: (
@@ -18,6 +16,7 @@ export interface TagProp {
   ) => any;
   modalProps?: Record<string, any>;
   formProps?: Record<string, any>;
+  initVal?: Record<string, any>;
 }
 
 function TagModForm(props: TagProp) {
@@ -26,70 +25,73 @@ function TagModForm(props: TagProp) {
     onCancel = () => {},
     modalProps,
     formProps,
+    initVal,
   } = props;
 
   const [form] = Form.useForm();
-  const { validateFields } = form;
+  const { validateFields, setFieldsValue } = form;
 
-  return <ConfigProvider locale={zhCN}>
-    <Modal
-      onCancel={onCancel}
-      onOk={async (e) => onOk(await validateFields(), e)}
-      {...modalProps}
+  useEffect(() => {
+    setFieldsValue(initVal);
+  }, [initVal]);
+
+  return <Modal
+    onCancel={onCancel}
+    onOk={async (e) => onOk(await validateFields(), e)}
+    {...modalProps}
+  >
+    <Form
+      form={form}
+      onFinish={onOk}
+      labelCol={{ span: 6 }}
+      wrapperCol={{ span: 18 }}
+      {...formProps}
     >
-      <Form
-        form={form}
-        onFinish={onOk}
-        labelCol={{ span: 6 }}
-        wrapperCol={{ span: 18 }}
-        {...formProps}
+      <Form.Item
+        name="name"
+        rules={[
+          { required: true, message: "标签名不能为空" },
+        ]}
+        label="标签名"
       >
-        <Form.Item
-          name="name"
-          rules={[
-            { required: true, message: "标签名不能为空" },
+        <Input
+          placeholder="标签名"
+          allowClear
+        />
+      </Form.Item>
+      <Form.Item
+        valuePropName="color"
+        name="color"
+        rules={[
+          { required: true, message: "请选个颜色" },
+        ]}
+        label="颜色"
+      >
+        <SketchPicker
+          width="unset"
+          disableAlpha
+          presetColors={[
+            "#f5222d",
+            "#fa541c",
+            "#fa8c16",
+            "#faad14",
+            "#fadb14",
+            "#a0d911",
+            "#52c41a",
+            "#13c2c2",
+            "#1890ff",
+            "#2f54eb",
+            "#722ed1",
+            "#eb2f96",
           ]}
-          label="标签名"
-        >
-          <Input
-            placeholder="标签名"
-            allowClear
-          />
-        </Form.Item>
-        <Form.Item
-          valuePropName="color"
-          name="color"
-          rules={[
-            { required: true, message: "请选个颜色" },
-          ]}
-          label="颜色"
-        >
-          <SketchPicker
-            width="unset"
-            disableAlpha
-            presetColors={[
-              "#f5222d",
-              "#fa541c",
-              "#fa8c16",
-              "#faad14",
-              "#fadb14",
-              "#a0d911",
-              "#52c41a",
-              "#13c2c2",
-              "#1890ff",
-              "#2f54eb",
-              "#722ed1",
-              "#eb2f96",
-            ]}
-          />
-        </Form.Item>
+        />
+      </Form.Item>
 
-        <Button htmlType="submit" style={{ display: "none" }}>
-          提交
-        </Button>,
-      </Form>
-    </Modal>
-  </ConfigProvider>;
+      <Button htmlType="submit" style={{ display: "none" }}>
+        提交
+      </Button>,
+    </Form>
+  </Modal>;
 }
 
 // 重载Updata 手动深复制

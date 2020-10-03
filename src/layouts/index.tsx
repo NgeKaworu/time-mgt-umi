@@ -1,6 +1,9 @@
 import React from "react";
 import type { PropsWithChildren } from "react";
 import styled from "styled-components";
+
+import { ConfigProvider } from "antd";
+
 import theme from "@/theme/";
 import {
   FormOutlined,
@@ -8,6 +11,8 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { useLocation, useHistory } from "react-router";
+
+import zhCN from "antd/es/locale/zh_CN";
 
 export const BottomFixPanel = styled.div`
     height:100%;
@@ -66,21 +71,23 @@ const menu = [
 export default (props: PropsWithChildren<any>) => {
   const { pathname } = useLocation();
   const history = useHistory();
-  return <BottomFixPanel>
-    <FillScrollPart>
-      {props.children}
-    </FillScrollPart>
-    <BottomMenu>
-      {menu.map((i) =>
-        <MenuItem
-          key={i.path}
-          active={i.path.includes(pathname)}
-          onClick={() => history.push(i.path)}
-        >
-          {i.icon}
-          {i.title}
-        </MenuItem>
-      )}
-    </BottomMenu>
-  </BottomFixPanel>;
+  return <ConfigProvider locale={zhCN}>
+    <BottomFixPanel>
+      <FillScrollPart>
+        {props.children}
+      </FillScrollPart>
+      <BottomMenu>
+        {menu.map((i) =>
+          <MenuItem
+            key={i.path}
+            active={i.path.includes(pathname)}
+            onClick={() => history.push(i.path)}
+          >
+            {i.icon}
+            {i.title}
+          </MenuItem>
+        )}
+      </BottomMenu>
+    </BottomFixPanel>
+  </ConfigProvider>;
 };
