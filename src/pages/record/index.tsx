@@ -38,7 +38,14 @@ export default () => {
               padding: "0 0 6px 6px",
             }}
           >
-            <Form.Item style={{ marginBottom: 0 }}>
+            <Form.Item
+              style={{ marginBottom: 0 }}
+              name="tid"
+              rules={[
+                { required: true, message: "请选一个标签" },
+                { type: "array", min: 0, message: "请选一个标签" },
+              ]}
+            >
               <TagMgt />
             </Form.Item>
           </FillScrollPart>

@@ -4,10 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 
 import { Tag, Spin, Modal } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, CheckCircleTwoTone } from "@ant-design/icons";
 
 import TagExec from "./TagExec";
 import type { TagSchema } from "@/models/tag";
+
+import theme from "@/theme";
 
 interface rootState {
   loading: {
@@ -30,10 +32,17 @@ const CusTag = styled(Tag)`
 `;
 
 export default function TagMgt(props?: TagMgtProps) {
+  const {
+    value = [],
+    onChange = () => {},
+  } = props || {};
+  console.log(props);
+
   const { list, loading } = useSelector((s: rootState) => ({
     list: s.tag.tags,
     loading: s.loading.models.tag,
   }));
+
   const tagExec = TagExec();
   const dispatch = useDispatch();
   useLayoutEffect(() => {
@@ -86,9 +95,8 @@ export default function TagMgt(props?: TagMgtProps) {
   }
 
   // 编辑标签
-  async function edit(formValues?: any, id: string) {
+  async function edit(id: string, formValues?: any) {
     try {
-      console.log(formValues);
       const { color: { hex }, ...restValues } = formValues;
       tagExec?.Update({
         modalProps: {
@@ -155,7 +163,7 @@ export default function TagMgt(props?: TagMgtProps) {
         title: "编辑标签",
       },
       initVal: tag,
-      onOk: (v) => edit(v, tag._id.$oid),
+      onOk: (v) => edit(tag._id.$oid, v),
       onCancel: closeExec,
     }).Execute();
   }
@@ -178,6 +186,13 @@ export default function TagMgt(props?: TagMgtProps) {
     </CusTag>
     {list.map((tag: TagSchema) =>
       <CusTag
+        onClick={() => {
+          const id = tag._id.$oid;
+          const temp = value.includes(id)
+            ? value.filter((v: string) => v !== id)
+            : value.concat(id);
+          onChange(temp);
+        }}
         closable
         onClose={(e: React.MouseEvent<HTMLElement, MouseEvent>) =>
           remove(tag._id.$oid, e)}
@@ -192,6 +207,9 @@ export default function TagMgt(props?: TagMgtProps) {
         }}
         onMouseUp={holdEnd}
       >
+        {value.includes(tag._id.$oid) &&
+          <CheckCircleTwoTone twoToneColor={theme["primary-color"]} />}
+        {" "}
         {tag.name}
       </CusTag>
     )}
