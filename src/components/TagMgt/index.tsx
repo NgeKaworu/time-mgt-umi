@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import styled from "styled-components";
@@ -20,11 +20,16 @@ interface rootState {
   };
 }
 
+interface TagMgtProps {
+  value: string[];
+  onChange: Function;
+}
+
 const CusTag = styled(Tag)`
     margin-top: 6px;
 `;
 
-export default function TagMgt() {
+export default function TagMgt(props: TagMgtProps) {
   const { list, loading } = useSelector((s: rootState) => ({
     list: s.tag.tags,
     loading: s.loading.models.tag,
@@ -36,6 +41,16 @@ export default function TagMgt() {
       tagExec.Destroy();
     };
   });
+
+  const holdHandler = useRef(0);
+
+  function holdStart(callback: Function, critical = 3000) {
+    holdHandler.current = setTimeout(callback, critical);
+  }
+
+  function holdEnd() {
+    clearTimeout(holdHandler.current);
+  }
 
   // 新建标签
   async function create(formValues?: any) {
@@ -82,6 +97,18 @@ export default function TagMgt() {
     }).Execute();
   }
 
+  // 打开编辑弹窗
+  function openEditExec() {
+    tagExec.Update({
+      modalProps: {
+        visible: true,
+        title: "编辑标签",
+      },
+      onOk: create,
+      onCancel: closeExec,
+    }).Execute();
+  }
+
   // 关闭弹窗
   function closeExec() {
     tagExec.Update({
@@ -102,6 +129,14 @@ export default function TagMgt() {
       <CusTag
         key={_id.$oid}
         color={color}
+        onTouchStart={() => {
+          holdStart(() => openEditExec(), 1000);
+        }}
+        onTouchEnd={holdEnd}
+        onMouseDown={() => {
+          holdStart(() => openEditExec(), 1000);
+        }}
+        onMouseUp={holdEnd}
       >
         {name}
       </CusTag>
