@@ -197,6 +197,7 @@ export default () => {
               name="dateRange"
             >
               <DatePicker.RangePicker
+                style={{ width: "100%" }}
                 allowClear
                 showTime={{ format: "HH:mm" }}
               />
