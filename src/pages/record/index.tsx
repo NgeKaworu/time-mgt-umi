@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import styled from "styled-components";
@@ -58,12 +58,13 @@ const RecordItem = styled.div`
   background: rgba(255,255,255, 0.85);
   box-shadow: 1px 1px 20px 1px rgba(233,233,233,0.85);
   cursor: pointer;
-  :hover{
+
+  &.active,
+  :hover {
     border-bottom: 3px solid ${theme["primary-color"]};
   };
 
-  .active,
-  :active{
+  :active {
     background: #fff;
     opacity: 0.85;
   }
@@ -94,7 +95,66 @@ export default () => {
   }));
   const dispatch = useDispatch();
 
-  console.log(list, tags);
+  const [curId, setCurId] = useState("");
+
+  async function submit(values: any) {
+    try {
+      if (curId) {
+        await dispatch(
+          { type: "record/update", payload: { ...values, _id: curId } },
+        );
+        setCurId("");
+      } else {
+        let deration: number = 0;
+        if (list.length) {
+          const lastRecord = list[0];
+          deration = moment().diff(
+            moment(lastRecord.createAt),
+            "ms",
+            true,
+          );
+        }
+        await dispatch(
+          { type: "record/add", payload: { ...values, deration } },
+        );
+      }
+      await dispatch({ type: "record/list" });
+      form.resetFields();
+    } catch (e) {
+      console.error("create err: ", e);
+    }
+  }
+
+  async function checked(record: RecordSchema) {
+    form.setFieldsValue(
+      { ...record, tid: record.tid?.map((t: ObjectId) => t.$oid) },
+    );
+    setCurId(record._id.$oid);
+  }
+
+  function cancel() {
+    form.resetFields();
+    setCurId("");
+  }
+
+  function msFormat(ms?: number): string | undefined {
+    if (!ms) return;
+
+    const HH = ~~(ms / (1000 * 60 * 60));
+    const mm = ((ms % (1000 * 60 * 60)) / (1000 * 60)).toFixed(2);
+
+    let str = "";
+
+    if (HH) {
+      str += `${HH}小时`;
+    }
+
+    if (mm) {
+      str += `${mm}分钟`;
+    }
+
+    return str;
+  }
 
   return (
     <BottomFixPanel>
@@ -102,7 +162,11 @@ export default () => {
         <Spin spinning={loading} wrapperClassName="cus-spin">
           {list.length
             ? list.map((record: RecordSchema) => {
-              return <RecordItem key={record._id.$oid}>
+              return <RecordItem
+                key={record._id.$oid}
+                onClick={() => checked(record)}
+                className={`${record._id.$oid === curId ? "active" : ""}`}
+              >
                 <h3 style={{ color: "#333" }}>
                   {moment(record.createAt).format("YYYY-MM-DD HH:mm:ss")}
                 </h3>
@@ -111,7 +175,7 @@ export default () => {
                     {record.event}
                   </div>
                   <div className="extra">
-                    {record.deration}
+                    {msFormat(record.deration)}
                   </div>
                 </div>
                 <div>
@@ -134,7 +198,7 @@ export default () => {
             : <CusEmpty />}
         </Spin>
       </CusFillScrollPart>
-      <Form onFinish={console.log} form={form}>
+      <Form onFinish={submit} form={form}>
         <BottomFixPanel
           style={{
             height: "120px",
@@ -172,8 +236,10 @@ export default () => {
             >
               <Input placeholder="请记录做了什么"></Input>
             </Form.Item>
-            <Button onClick={() => form.resetFields()}>取消</Button>
-            <Button type="primary" htmlType="submit">记录</Button>
+            <Button onClick={cancel}>取消</Button>
+            <Button type="primary" htmlType="submit">
+              {curId ? "修改" : "记录"}
+            </Button>
           </InputBar>
         </BottomFixPanel>
       </Form>
