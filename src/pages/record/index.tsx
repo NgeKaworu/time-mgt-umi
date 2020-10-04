@@ -12,6 +12,9 @@ import type { RecordSchema } from "@/models/record";
 import type { TagSchema } from "@/models/tag";
 import type { ObjectId } from "@/utils/type";
 
+import Throttle from "@/js-sdk/native/throttle";
+import OnReachBottom from "@/js-sdk/native/onReachBottom";
+
 import theme from "@/theme";
 import moment from "moment";
 
@@ -34,6 +37,7 @@ const InputBar = styled.div`
 
 const CusFillScrollPart = styled(FillScrollPart)`
   background: #eee;
+  position: relative;
   .cus-spin,
   .ant-spin-container
    {
@@ -41,7 +45,9 @@ const CusFillScrollPart = styled(FillScrollPart)`
   }
 
   .ant-spin{
-    max-height: unset !important;
+    position: absolute;
+    width: 100%;
+    top: 50%;
   }
 `;
 
@@ -150,48 +156,61 @@ export default () => {
   return (
     <BottomFixPanel>
       <CusFillScrollPart
-        onScroll={(e) => {
-          console.log(e.currentTarget.getBoundingClientRect());
+        onScroll={(e: React.UIEvent<HTMLElement, UIEvent>) => {
+          // Note:
+          // If you want to access the event properties in an asynchronous way,
+          // you should call event.persist() on the event.
+          e.persist();
+          // 触底
+          OnReachBottom(
+            // 节流
+            Throttle(async () => {
+              try {
+                await dispatch({ type: "record/nextPage" });
+              } catch (e) {
+                console.error(e);
+              }
+            }, 2000),
+          )(e, 200);
         }}
       >
-        <Spin spinning={loading} wrapperClassName="cus-spin">
-          {list.length
-            ? list.map((record: RecordSchema) => {
-              return <RecordItem
-                key={record._id.$oid}
-                onClick={() => checked(record)}
-                className={`${record._id.$oid === curId ? "active" : ""}`}
-              >
-                <h3 style={{ color: "#333" }}>
-                  {moment(record.createAt).format("YYYY-MM-DD HH:mm:ss")}
-                </h3>
-                <div className="content">
-                  <div className="main">
-                    {record.event}
-                  </div>
-                  <div className="extra">
-                    {msFormat(record.deration)}
-                  </div>
+        {list.length
+          ? list.map((record: RecordSchema) => {
+            return <RecordItem
+              key={record._id.$oid}
+              onClick={() => checked(record)}
+              className={`${record._id.$oid === curId ? "active" : ""}`}
+            >
+              <h3 style={{ color: "#333" }}>
+                {moment(record.createAt).format("YYYY-MM-DD HH:mm:ss")}
+              </h3>
+              <div className="content">
+                <div className="main">
+                  {record.event}
                 </div>
-                <div>
-                  {record?.tid?.map((tag: ObjectId) => {
-                    const oid = tag.$oid;
-                    const findTag = tags.find((t: TagSchema) =>
-                      t._id.$oid === oid
-                    );
+                <div className="extra">
+                  {msFormat(record.deration)}
+                </div>
+              </div>
+              <div>
+                {record?.tid?.map((tag: ObjectId) => {
+                  const oid = tag.$oid;
+                  const findTag = tags.find((t: TagSchema) =>
+                    t._id.$oid === oid
+                  );
 
-                    return <CusTag
-                      key={oid}
-                      color={findTag?.color}
-                    >
-                      {findTag?.name}
-                    </CusTag>;
-                  })}
-                </div>
-              </RecordItem>;
-            })
-            : <CusEmpty />}
-        </Spin>
+                  return <CusTag
+                    key={oid}
+                    color={findTag?.color}
+                  >
+                    {findTag?.name}
+                  </CusTag>;
+                })}
+              </div>
+            </RecordItem>;
+          })
+          : <CusEmpty />}
+        <Spin spinning={loading} wrapperClassName="cus-spin"></Spin>
       </CusFillScrollPart>
       <Form onFinish={submit} form={form}>
         <BottomFixPanel

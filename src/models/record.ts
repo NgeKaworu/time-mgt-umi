@@ -1,6 +1,7 @@
 import { ModalSchma } from "@/models/global";
 import { ObjectId } from "@/utils/type";
 import { RESTful } from "@/http";
+import { message } from "antd";
 
 export interface RecordSchema {
   _id: ObjectId;
@@ -15,6 +16,14 @@ export interface RecordSchema {
 export interface StatisticSchema {
   _id: ObjectId;
   deration: number;
+}
+
+interface rootState {
+  record: {
+    list: RecordSchema[];
+    limit: number;
+    page: number;
+  };
 }
 
 const TagModal: ModalSchma = {
@@ -46,6 +55,33 @@ const TagModal: ModalSchma = {
       );
       return yield put({ type: "save", payload: { list: data } });
     },
+    *nextPage(_, { select, put }) {
+      const { list, limit, page } = yield select((store: rootState) => ({
+        list: store.record.list,
+        limit: store.record.limit,
+        page: store.record.page,
+      }));
+      const { data } = yield RESTful.get(
+        "/main/v1/record/list",
+        {
+          params: {
+            skip: page * limit,
+          },
+          silence: "success",
+        },
+      );
+      if (data.length) {
+        return message.warn({ content: "没有更多了" });
+      }
+
+      return yield put(
+        {
+          type: "save",
+          payload: { list: list.concat(data), page: page + 1 },
+        },
+      );
+    },
+
     *statistic({ payload }, { put }) {
       const { data } = yield RESTful.post(
         "/main/v1/record/statistic",

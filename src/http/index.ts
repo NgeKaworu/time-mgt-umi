@@ -10,7 +10,7 @@ import type { AxiosResponse, AxiosRequestConfig, Method } from "axios";
 
 declare global {
   interface Window {
-    routerBase?: "string";
+    routerBase?: string;
   }
 }
 
@@ -120,13 +120,13 @@ function request(url: string, options: BizOptions = {}) {
     // silence标记为true 则不显示消息
     if (!(silence === true || silence === "fail")) {
       const timeoutMsg = eMsg.match("timeout") && "连接超时， 请检查网络。";
-      const netErrMsg = eMsg.match("Network Error") && "网络错误，请检查网络。"
+      const netErrMsg = eMsg.match("Network Error") && "网络错误，请检查网络。";
 
       message.error({
         content:
           // 超时
           timeoutMsg ||
-          netErrMsg||
+          netErrMsg ||
           // 后端业务错误
           response?.data?.errMsg ||
           // 错误码错误
