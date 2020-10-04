@@ -106,7 +106,7 @@ export default function TagMgt(props?: TagMgtProps) {
         type: "tag/update",
         payload: {
           id,
-          color: hex,
+          color: hex || formValues?.color,
           ...restValues,
         },
       });

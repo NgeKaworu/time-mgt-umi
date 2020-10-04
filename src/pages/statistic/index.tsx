@@ -107,7 +107,6 @@ export default () => {
   const dispatch = useDispatch();
 
   const total = statistic?.reduce((acc, cur) => acc += cur.deration, 0);
-  console.log(tags, statistic, total);
   async function submit(values: any) {
     try {
       await dispatch({ type: "record/statistic", payload: values });
