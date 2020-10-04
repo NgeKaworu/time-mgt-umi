@@ -10,10 +10,6 @@ import TagMgt from "@/components/TagMgt";
 
 import type { StatisticSchema } from "@/models/record";
 import type { TagSchema } from "@/models/tag";
-import type { ObjectId } from "@/utils/type";
-
-import theme from "@/theme";
-import moment from "moment";
 
 interface rootState {
   record: {

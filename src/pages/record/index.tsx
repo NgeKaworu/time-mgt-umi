@@ -105,17 +105,8 @@ export default () => {
         );
         setCurId("");
       } else {
-        let deration: number = 0;
-        if (list.length) {
-          const lastRecord = list[0];
-          deration = moment().diff(
-            moment(lastRecord.createAt),
-            "ms",
-            true,
-          );
-        }
         await dispatch(
-          { type: "record/add", payload: { ...values, deration } },
+          { type: "record/add", payload: values },
         );
       }
       await dispatch({ type: "record/list" });
@@ -158,7 +149,11 @@ export default () => {
 
   return (
     <BottomFixPanel>
-      <CusFillScrollPart>
+      <CusFillScrollPart
+        onScroll={(e) => {
+          console.log(e.currentTarget.getBoundingClientRect());
+        }}
+      >
         <Spin spinning={loading} wrapperClassName="cus-spin">
           {list.length
             ? list.map((record: RecordSchema) => {
