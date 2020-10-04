@@ -21,4 +21,5 @@ export default defineConfig({
   theme,
   hash: true,
   base: "/time-mgt",
+  title: "柳比歇夫时间管理法",
 });

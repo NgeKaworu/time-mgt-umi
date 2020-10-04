@@ -234,7 +234,8 @@ export default () => {
                 { required: true, message: "请记录做了什么" },
               ]}
             >
-              <Input placeholder="请记录做了什么"></Input>
+              <Input placeholder="请记录做了什么" allowClear autoComplete="off">
+              </Input>
             </Form.Item>
             <Button onClick={cancel}>取消</Button>
             <Button type="primary" htmlType="submit">

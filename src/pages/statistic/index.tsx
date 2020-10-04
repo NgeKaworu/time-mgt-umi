@@ -1,12 +1,212 @@
-import React, { useEffect } from 'react';
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
+import styled from "styled-components";
+
+import { Button, DatePicker, Form, Spin, Empty } from "antd";
+
+import { BottomFixPanel, FillScrollPart } from "@/layouts/";
+import TagMgt from "@/components/TagMgt";
+
+import type { StatisticSchema } from "@/models/record";
+import type { TagSchema } from "@/models/tag";
+import type { ObjectId } from "@/utils/type";
+
+import theme from "@/theme";
+import moment from "moment";
+
+interface rootState {
+  record: {
+    statistic: StatisticSchema[];
+  };
+  tag: {
+    list: TagSchema[];
+  };
+  loading: {
+    models: { record: boolean };
+  };
+}
+
+interface StatisticItemProps {
+  color?: string;
+  ratio: string;
+}
+
+const InputBar = styled.div`
+  display: flex;
+  width: 100%;
+`;
+
+const CusFillScrollPart = styled(FillScrollPart)`
+  background: #eee;
+  .cus-spin,
+  .ant-spin-container
+   {
+    height: 100%;
+  }
+
+  .ant-spin{
+    max-height: unset !important;
+  }
+`;
+
+const CusEmpty = styled(Empty)`
+  height: 100%;
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+`;
+
+const RecordItem = styled.div<StatisticItemProps>`
+margin: 8px 12px;
+padding: 10px 16px;
+background: rgba(255, 255, 255, 0.85);
+box-shadow: 1px 1px 20px 1px rgba(233, 233, 233, 0.85);
+cursor: pointer;
+position: relative;
+& *{
+  position: relative;
+  color: white;
+  mix-blend-mode: difference;
+};
+
+.content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.main {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.extra {
+  font-size: 16px;
+  font-weight: 100;
+}
+
+:before {
+  content: ' ';
+  position: absolute;
+  width: ${(props) => props.ratio}%;
+  background: ${(props) => props.color};
+  height: 100%;
+  top: 0;
+  left: 0;
+} 
+`;
 
 export default () => {
-  useEffect(() => {
-    console.log("123")
-  })
+  const [form] = Form.useForm();
+  const { statistic, loading, tags } = useSelector((s: rootState) => ({
+    statistic: s.record.statistic,
+    loading: s.loading.models.record,
+    tags: s.tag.list,
+  }));
+  const dispatch = useDispatch();
+
+  const total = statistic?.reduce((acc, cur) => acc += cur.deration, 0);
+  console.log(tags, statistic, total);
+  async function submit(values: any) {
+    try {
+      await dispatch({ type: "record/statistic", payload: values });
+    } catch (e) {
+      console.error("create err: ", e);
+    }
+  }
+
+  function cancel() {
+    form.resetFields();
+  }
+
+  function msFormat(ms?: number): string | undefined {
+    if (!ms) return;
+
+    const HH = ~~(ms / (1000 * 60 * 60));
+    const mm = ((ms % (1000 * 60 * 60)) / (1000 * 60)).toFixed(2);
+
+    let str = "";
+
+    if (HH) {
+      str += `${HH}小时`;
+    }
+
+    if (mm) {
+      str += `${mm}分钟`;
+    }
+
+    return str;
+  }
+
   return (
-    <div>
-      <h1 >Page index</h1>
-    </div>
+    <BottomFixPanel>
+      <CusFillScrollPart>
+        <Spin spinning={loading} wrapperClassName="cus-spin">
+          {statistic.length
+            ? statistic.map((record: StatisticSchema) => {
+              const tag = tags.find((t: TagSchema) =>
+                t._id.$oid === record._id.$oid
+              );
+              const ratio = (record.deration / total * 100).toFixed(2);
+              return <RecordItem
+                key={record._id.$oid}
+                ratio={ratio}
+                color={tag?.color}
+              >
+                <h3>{tag?.name}</h3>
+                <div className="content">
+                  <div className="main">
+                    {ratio}%
+                  </div>
+                  <div className="extra">
+                    {msFormat(record.deration)}
+                  </div>
+                </div>
+              </RecordItem>;
+            })
+            : <CusEmpty />}
+        </Spin>
+      </CusFillScrollPart>
+      <Form onFinish={submit} form={form}>
+        <BottomFixPanel
+          style={{
+            height: "120px",
+            borderTop: "1px solid rgba(233,233,233, 05)",
+            boxShadow: "0px 0px 20px 0px rgba(0,0,0,0.1)",
+          }}
+        >
+          <FillScrollPart
+            style={{
+              padding: "0 0 6px 6px",
+            }}
+          >
+            <Form.Item
+              style={{ marginBottom: 0 }}
+              name="tids"
+            >
+              <TagMgt />
+            </Form.Item>
+          </FillScrollPart>
+
+          <InputBar>
+            <Form.Item
+              style={{
+                marginBottom: 0,
+                flex: 1,
+              }}
+              name="dateRange"
+            >
+              <DatePicker.RangePicker
+                allowClear
+                showTime={{ format: "HH:mm" }}
+              />
+            </Form.Item>
+            <Button onClick={cancel}>取消</Button>
+            <Button type="primary" htmlType="submit">查询</Button>
+          </InputBar>
+        </BottomFixPanel>
+      </Form>
+    </BottomFixPanel>
   );
-}
+};

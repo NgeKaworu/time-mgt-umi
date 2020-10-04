@@ -12,9 +12,15 @@ export interface RecordSchema {
   deration: number;
 }
 
+export interface StatisticSchema {
+  _id: ObjectId;
+  deration: number;
+}
+
 const TagModal: ModalSchma = {
   state: {
     list: [],
+    statistic: [],
     limit: 10,
     page: 1,
   },
@@ -40,12 +46,32 @@ const TagModal: ModalSchma = {
       );
       return yield put({ type: "save", payload: { list: data } });
     },
+    *statistic({ payload }, { put }) {
+      const { data } = yield RESTful.post(
+        "/main/v1/record/statistic",
+        { data: payload, silence: "success" },
+      );
+      return yield put({ type: "save", payload: { statistic: data } });
+    },
   },
   subscriptions: {
     setup({ history, dispatch }): void {
-      history.listen(({ pathname }) => {
-        if (pathname.includes("/record")) {
-          dispatch({ type: "list" });
+      history.listen(async ({ pathname }) => {
+        try {
+          if (pathname.includes("/record")) {
+            await dispatch({ type: "list" });
+          }
+        } catch (e) {
+          console.error("init list error", e);
+        }
+      });
+      history.listen(async ({ pathname }) => {
+        try {
+          if (pathname.includes("/statistic")) {
+            await dispatch({ type: "statistic" });
+          }
+        } catch (e) {
+          console.error("init statistic error", e);
         }
       });
       // Subscribe history(url) change, trigger `load` action if pathname is `/`
