@@ -2,8 +2,12 @@ import React, { useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { UserSchema } from "@/models/user";
-import { Form, Input, Button, Space } from "antd";
-import { MailOutlined, LockOutlined, UserOutlined } from "@ant-design/icons";
+import { Form, Input, Button, Space, Divider } from "antd";
+import {
+  MailOutlined,
+  LockOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import styled from "styled-components";
 
 interface RootState {
@@ -21,6 +25,15 @@ const Wrap = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    position: relative;
+`;
+
+const Footer = styled.footer`
+    width: 100%;
+    text-align: center;
+    vertical-align: middle;
+    position: absolute;
+    bottom: 16.8%;
 `;
 
 export default () => {
@@ -141,6 +154,19 @@ export default () => {
             </a>
           </Form.Item>
         </Form>}
+      <Footer>
+        <Space direction="vertical">
+          东隅已逝，桑榆未晚。
+
+          <div>
+            <a>柳比歇夫工作法</a>
+            <Divider type="vertical" />
+            <a>同步博客</a>
+            <Divider type="vertical" />
+            <a>源码</a>
+          </div>
+        </Space>
+      </Footer>
     </Wrap>
   );
 };

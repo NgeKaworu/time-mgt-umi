@@ -1,17 +1,22 @@
 import { ModalSchma } from "@/models/global";
 import { ObjectId } from "@/utils/type";
 import { RESTful } from "@/http";
-export interface TagSchema {
+
+export interface RecordSchema {
   _id: ObjectId;
-  name: string;
-  color: string;
+  uid: ObjectId;
+  tid?: ObjectId[];
+  event: string;
   createAt: Date;
   updateAt: Date;
+  deration: number;
 }
 
 const TagModal: ModalSchma = {
   state: {
     list: [],
+    limit: 10,
+    page: 1,
   },
   reducers: {
     save(state, { payload }) {
@@ -20,17 +25,17 @@ const TagModal: ModalSchma = {
   },
   effects: {
     *add({ payload }) {
-      return yield RESTful.post("/main/v1/tag/create", { data: payload });
+      return yield RESTful.post("/main/v1/record/create", { data: payload });
     },
     *delete({ payload }) {
-      return yield RESTful.delete(`/main/v1/tag/${payload}`);
+      return yield RESTful.delete(`/main/v1/record/${payload}`);
     },
     *update({ payload }) {
-      return yield RESTful.put("/main/v1/tag/update", { data: payload });
+      return yield RESTful.put("/main/v1/record/update", { data: payload });
     },
     *list(_, { put }) {
       const { data } = yield RESTful.get(
-        "/main/v1/tag/list",
+        "/main/v1/record/list",
         { silence: "success" },
       );
       return yield put({ type: "save", payload: { list: data } });
@@ -39,7 +44,7 @@ const TagModal: ModalSchma = {
   subscriptions: {
     setup({ history, dispatch }): void {
       history.listen(({ pathname }) => {
-        if (["/record", "/statistic"].some((path) => pathname.includes(path))) {
+        if (pathname.includes("/record")) {
           dispatch({ type: "list" });
         }
       });

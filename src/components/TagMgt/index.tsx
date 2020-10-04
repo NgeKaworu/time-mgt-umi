@@ -18,7 +18,7 @@ interface rootState {
     };
   };
   tag: {
-    tags: TagSchema[];
+    list: TagSchema[];
   };
 }
 
@@ -27,7 +27,7 @@ interface TagMgtProps {
   onChange?: Function;
 }
 
-const CusTag = styled(Tag)`
+export const CusTag = styled(Tag)`
     margin-top: 6px;
 `;
 
@@ -36,10 +36,9 @@ export default function TagMgt(props?: TagMgtProps) {
     value = [],
     onChange = () => {},
   } = props || {};
-  console.log(props);
 
   const { list, loading } = useSelector((s: rootState) => ({
-    list: s.tag.tags,
+    list: s.tag.list,
     loading: s.loading.models.tag,
   }));
 
@@ -199,11 +198,11 @@ export default function TagMgt(props?: TagMgtProps) {
         key={tag._id.$oid}
         color={tag.color}
         onTouchStart={() => {
-          holdStart(() => openEditExec(tag), 1000);
+          holdStart(() => openEditExec(tag), 500);
         }}
         onTouchEnd={holdEnd}
         onMouseDown={() => {
-          holdStart(() => openEditExec(tag), 1000);
+          holdStart(() => openEditExec(tag), 500);
         }}
         onMouseUp={holdEnd}
       >
