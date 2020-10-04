@@ -70,7 +70,7 @@ const TagModal: ModalSchma = {
           silence: "success",
         },
       );
-      if (data.length) {
+      if (!data.length) {
         return message.warn({ content: "没有更多了" });
       }
 
