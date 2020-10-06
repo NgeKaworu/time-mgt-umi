@@ -20,6 +20,12 @@ export default defineConfig({
   ],
   theme,
   hash: true,
-  base: "/time-mgt",
   title: "柳比歇夫时间管理法",
+  base: "/time-mgt/",
+  publicPath: "/time-mgt/",
+  runtimePublicPath: true,
+  dynamicImport: {
+    loading: "@/Loading",
+  },
+  favicon: '/assets/favicon.ico',
 });
