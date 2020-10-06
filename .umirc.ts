@@ -21,7 +21,7 @@ export default defineConfig({
   theme,
   hash: true,
   title: "柳比歇夫时间管理法",
-  base: "/time-mgt/",
+  base: "/time-mgt",
   publicPath: "/time-mgt/",
   runtimePublicPath: true,
   dynamicImport: {
