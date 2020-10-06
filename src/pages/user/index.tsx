@@ -159,11 +159,18 @@ export default () => {
           东隅已逝，桑榆未晚。
 
           <div>
-            <a>柳比歇夫工作法</a>
+            <a href="https://www.douban.com/note/226926167/" target="_blank">
+              柳比歇夫工作法
+            </a>
             <Divider type="vertical" />
-            <a>同步博客</a>
+            <a href="https://furan.xyz/" target="_blank">同步博客</a>
             <Divider type="vertical" />
-            <a>源码</a>
+            <a
+              href="https://github.com/NgeKaworu/time-mgt-umi3"
+              target="_blank"
+            >
+              源码
+            </a>
           </div>
         </Space>
       </Footer>
