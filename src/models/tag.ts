@@ -38,9 +38,15 @@ const TagModal: ModalSchma = {
   },
   subscriptions: {
     setup({ history, dispatch }): void {
-      history.listen(({ pathname }) => {
-        if (["/record", "/statistic"].some((path) => pathname.includes(path))) {
-          dispatch({ type: "list" });
+      history.listen(async ({ pathname }) => {
+        try {
+          if (
+            ["/record", "/statistic"].some((path) => pathname.includes(path))
+          ) {
+            await dispatch({ type: "list" });
+          }
+        } catch (e) {
+          console.error(e);
         }
       });
       // Subscribe history(url) change, trigger `load` action if pathname is `/`
