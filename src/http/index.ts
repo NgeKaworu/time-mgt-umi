@@ -175,7 +175,7 @@ export const RESTful = restful.reduce((
 }), {});
 
 const graphql = ["query", "mutation"];
-export const Graphql = graphql.reduce(
+export const GraphQL = graphql.reduce(
   (acc: { [k: string]: Function }, method) => ({
     ...acc,
     [method]: (
