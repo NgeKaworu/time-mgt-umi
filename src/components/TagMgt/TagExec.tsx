@@ -57,6 +57,7 @@ function TagModForm(props: TagProp) {
         <Input
           placeholder="标签名"
           allowClear
+          autoComplete="off"
         />
       </Form.Item>
       <Form.Item
