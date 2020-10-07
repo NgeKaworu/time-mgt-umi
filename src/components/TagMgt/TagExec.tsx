@@ -126,10 +126,8 @@ class TagExec extends Executer {
   }
 }
 
-const Execiztion = (options?: TagProp) => {
+export default (options?: TagProp) => {
   return new TagExec(
     <TagModForm {...options} />,
   );
 };
-
-export default Execiztion;
