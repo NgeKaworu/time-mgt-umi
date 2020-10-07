@@ -28,7 +28,7 @@ interface TagMgtProps {
 }
 
 export const CusTag = styled(Tag)`
-    margin-top: 6px;
+    margin-top: 6px !important;
 `;
 
 export default function TagMgt(props?: TagMgtProps) {
