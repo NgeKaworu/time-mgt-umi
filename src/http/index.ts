@@ -61,27 +61,17 @@ function request(url: string, options: BizOptions = {}) {
   const {
     errCatch = false,
     silence = false,
-    reAuth = true,
+    reAuth = false,
     headers,
     coressPorxy = true,
     ...restOptions
   } = options;
 
-  // 基础设置
-  const baseSetting = {
-    // 超时
-    timeout: 10000,
-    headers: {
-      Authorization: `${localStorage.getItem("token")}`,
-      ...headers,
-    },
-  };
-
-  // 多端转发机制
+  // 多host多端下的url分发机制
   const proxyUrl = coressPorxy ? proxy(url, proxyCfg) : url;
 
-  // 主要处理业务错误
-  function extraHandler(response: AxiosResponse) {
+  // 主要业务处理
+  function bizHandler(response: AxiosResponse) {
     if (response?.data?.ok) {
       return response;
     }
@@ -101,21 +91,18 @@ function request(url: string, options: BizOptions = {}) {
   }
 
   //全局错误处理
-  function errorHandler(error: BizError) {
+  function errorHandler(error: BizError): any {
     const { response, message: eMsg } = error;
     // reAuth标记是用来防止连续401的熔断处理
 
-    if (response?.status === 401 && reAuth) {
-      message.warning({
+    if (response?.status === 401) {
+      return reAuth ? reAuthorization() : message.warning({
         content: "请先登录",
         onClose: () => {
           localStorage.clear();
           location.replace(`${window.routerBase}/user/`);
         },
       });
-
-      return;
-      // return reAuthorization();
     }
     // silence标记为true 则不显示消息
     if (!(silence === true || silence === "fail")) {
@@ -143,25 +130,33 @@ function request(url: string, options: BizOptions = {}) {
   }
 
   // 重新授权处理
-  // function reAuthorization() {
-  //   return http
-  //     .get('/uc/oauth2/refresh', {
-  //       reAuth: false,
-  //       silence: 'success',
-  //       params: { token: sessionStorage.getStorage('refresh_token') },
-  //     })
-  //     .then(({ data: [{ token, refresh_token }] }) => {
-  //       sessionStorage.setItem('token', token);
-  //       // Taro.setStorage('refresh_token', refresh_token);
-  //       return http(url, { ...options, reAuth: false });
-  //     });
-  // }
+  function reAuthorization() {
+    return RESTful
+      .get("/uc/oauth2/refresh", {
+        reAuth: false,
+        silence: "success",
+        params: { token: localStorage.getStorage("refresh_token") },
+      })
+      .then((resp: AxiosResponse) => {
+        localStorage.setItem("token", resp.data.token);
+        localStorage.setItem("refresh_token", resp.data.refresh_token);
+        return request(url, { ...options, reAuth: false });
+      });
+  }
 
   return axios(proxyUrl, {
-    ...baseSetting,
-    ...restOptions,
-  }).then(extraHandler)
+    timeout: 10000,
+    headers: {
+      Authorization: `${localStorage.getItem("token")}`,
+      ...headers,
+    },
+    ...restOptions, // axios request options
+  })
+    // 业务pipe
+    .then(bizHandler)
+    // 请求成功pipe
     .then(successHandler)
+    // 请求失败pipe
     .catch(errorHandler);
 }
 
