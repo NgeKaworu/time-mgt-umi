@@ -11,6 +11,8 @@ import TagMgt from "@/components/TagMgt";
 import type { StatisticSchema } from "@/models/record";
 import type { TagSchema } from "@/models/tag";
 
+import moment from "moment";
+
 interface rootState {
   record: {
     statistic: StatisticSchema[];
@@ -196,10 +198,18 @@ export default () => {
                 style={{ width: "100%" }}
                 allowClear
                 showTime={{ format: "HH:mm" }}
+                ranges={{
+                  "今天": [moment(), moment()],
+                  "本周": [moment().startOf("week"), moment().endOf("week")],
+                  "本月": [moment().startOf("month"), moment().endOf("month")],
+                  "今年": [moment().startOf("year"), moment().endOf("year")],
+                }}
               />
             </Form.Item>
             <Button onClick={cancel}>取消</Button>
-            <Button type="primary" htmlType="submit">查询</Button>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              查询
+            </Button>
           </InputBar>
         </BottomFixPanel>
       </Form>

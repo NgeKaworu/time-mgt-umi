@@ -251,7 +251,7 @@ export default () => {
               <Input placeholder="请记录做了什么" allowClear autoComplete="off">
               </Input>
             </Form.Item>
-            <Button onClick={cancel}>取消</Button>
+            <Button onClick={cancel} loading={loading}>取消</Button>
             <Button type="primary" htmlType="submit">
               {curId ? "修改" : "记录"}
             </Button>
