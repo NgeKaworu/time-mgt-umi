@@ -27,5 +27,5 @@ export default defineConfig({
   dynamicImport: {
     loading: "@/Loading",
   },
-  favicon: '/assets/favicon.ico',
+  favicon: './assets/favicon.ico',
 });
