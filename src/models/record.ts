@@ -67,6 +67,7 @@ const TagModal: ModalSchma = {
         {
           params: {
             skip: page * limit,
+            limit,
           },
           silence: "success",
         },
