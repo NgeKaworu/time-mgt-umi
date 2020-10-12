@@ -49,10 +49,10 @@ const TagModal: ModalSchma = {
     *update({ payload }) {
       return yield RESTful.put("/main/v1/record/update", { data: payload });
     },
-    *list(_, { put }) {
+    *list({ params }, { put }) {
       const { data } = yield RESTful.get(
         "/main/v1/record/list",
-        { silence: "success" },
+        { silence: "success", params },
       );
       return yield put({ type: "save", payload: { list: data } });
     },
