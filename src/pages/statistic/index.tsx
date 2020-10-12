@@ -146,7 +146,13 @@ export default () => {
             : <CusEmpty />}
         </Spin>
       </CusFillScrollPart>
-      <Form onFinish={submit} form={form}>
+      <Form
+        onFinish={submit}
+        form={form}
+        initialValues={{
+          dateRange: [moment().startOf("day"), moment().endOf("day")],
+        }}
+      >
         <BottomFixPanel
           style={{
             height: "120px",

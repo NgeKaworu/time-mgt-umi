@@ -2,6 +2,7 @@ import { ModalSchma } from "@/models/global";
 
 import { RESTful } from "@/http";
 import { message } from "antd";
+import moment from "moment";
 
 export interface RecordSchema {
   id: string;
@@ -104,7 +105,12 @@ const TagModal: ModalSchma = {
       history.listen(async ({ pathname }) => {
         try {
           if (pathname.includes("/statistic")) {
-            await dispatch({ type: "statistic" });
+            await dispatch({
+              type: "statistic",
+              payload: {
+                dateRange: [moment().startOf("day"), moment().endOf("day")],
+              },
+            });
           }
         } catch (e) {
           console.error("init statistic error", e);
