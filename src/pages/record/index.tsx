@@ -192,7 +192,7 @@ export default () => {
       <Form onFinish={submit} form={form}>
         <BottomFixPanel
           style={{
-            height: "120px",
+            height: "25vh",
             borderTop: "1px solid rgba(233,233,233, 05)",
             boxShadow: "0px 0px 20px 0px rgba(0,0,0,0.1)",
           }}

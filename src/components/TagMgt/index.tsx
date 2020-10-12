@@ -180,7 +180,7 @@ export default function TagMgt(props?: TagMgtProps) {
       },
     }).Execute();
   }
-  
+
   return <Spin spinning={loading}>
     <div style={{ borderBottom: "1px solid #e9e9e9" }}>
       <Checkbox
@@ -204,6 +204,19 @@ export default function TagMgt(props?: TagMgtProps) {
       >
         全选
       </Checkbox>
+      <a
+        onClick={() => {
+          const inverse = list.reduce((acc: string[], cur: TagSchema) => {
+            if (!value.includes(cur.id)) {
+              return [...acc, cur.id];
+            }
+            return acc;
+          }, []);
+          onChange(inverse);
+        }}
+      >
+        反选
+      </a>
     </div>
     <CusTag
       style={{ borderStyle: "dashed", background: "#fff" }}
@@ -229,6 +242,13 @@ export default function TagMgt(props?: TagMgtProps) {
           if (temp.length === list.length) {
             setCheckAll({
               checked: true,
+              indeterminate: false,
+            });
+          }
+
+          if (temp.length === 0) {
+            setCheckAll({
+              checked: false,
               indeterminate: false,
             });
           }
