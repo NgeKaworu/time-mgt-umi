@@ -162,7 +162,7 @@ export default function TagMgt(props?: TagMgtProps) {
         title: "编辑标签",
       },
       initVal: tag,
-      onOk: (v) => edit(tag._id.$oid, v),
+      onOk: (v) => edit(tag.id, v),
       onCancel: closeExec,
     }).Execute();
   }
@@ -186,7 +186,7 @@ export default function TagMgt(props?: TagMgtProps) {
     {list.map((tag: TagSchema) =>
       <CusTag
         onClick={() => {
-          const id = tag._id.$oid;
+          const id = tag.id;
           const temp = value.includes(id)
             ? value.filter((v: string) => v !== id)
             : value.concat(id);
@@ -194,8 +194,8 @@ export default function TagMgt(props?: TagMgtProps) {
         }}
         closable
         onClose={(e: React.MouseEvent<HTMLElement, MouseEvent>) =>
-          remove(tag._id.$oid, e)}
-        key={tag._id.$oid}
+          remove(tag.id, e)}
+        key={tag.id}
         color={tag.color}
         onTouchStart={() => {
           holdStart(() => openEditExec(tag), 500);
@@ -206,7 +206,7 @@ export default function TagMgt(props?: TagMgtProps) {
         }}
         onMouseUp={holdEnd}
       >
-        {value.includes(tag._id.$oid) &&
+        {value.includes(tag.id) &&
           <CheckCircleTwoTone twoToneColor={theme["primary-color"]} />}
         {" "}
         {tag.name}

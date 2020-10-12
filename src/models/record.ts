@@ -1,12 +1,12 @@
 import { ModalSchma } from "@/models/global";
-import { ObjectId } from "@/utils/type";
+
 import { RESTful } from "@/http";
 import { message } from "antd";
 
 export interface RecordSchema {
-  _id: ObjectId;
-  uid: ObjectId;
-  tid?: ObjectId[];
+  id: string;
+  uid: string;
+  tid?: string[];
   event: string;
   createAt: Date;
   updateAt: Date;
@@ -14,7 +14,7 @@ export interface RecordSchema {
 }
 
 export interface StatisticSchema {
-  _id: ObjectId;
+  id: string;
   deration: number;
 }
 

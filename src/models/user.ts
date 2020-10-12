@@ -1,8 +1,8 @@
 import { ModalSchma } from "@/models/global";
-import { ObjectId } from "@/utils/type";
+
 import { RESTful } from "@/http";
 export interface UserSchema {
-  _id?: ObjectId;
+  id?: string;
   name?: string;
   email?: string;
   createAt?: Date;
@@ -11,7 +11,7 @@ export interface UserSchema {
 
 const UserModal: ModalSchma = {
   state: {
-    _id: undefined,
+    id: undefined,
     name: undefined,
     email: undefined,
     createAt: undefined,
@@ -41,7 +41,7 @@ const UserModal: ModalSchma = {
       yield put({
         type: "save",
         payload: {
-          _id: undefined,
+          id: undefined,
           name: undefined,
           email: undefined,
           createAt: undefined,

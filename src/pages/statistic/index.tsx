@@ -3,13 +3,15 @@ import { useDispatch, useSelector } from "react-redux";
 
 import styled from "styled-components";
 
-import { Button, DatePicker, Form, Spin, Empty } from "antd";
+import { Button, DatePicker, Empty, Form, Spin } from "antd";
 
 import { BottomFixPanel, FillScrollPart } from "@/layouts/";
 import TagMgt from "@/components/TagMgt";
 
 import type { StatisticSchema } from "@/models/record";
 import type { TagSchema } from "@/models/tag";
+
+import { nsFormat } from "@/utils/goTime";
 
 import moment from "moment";
 
@@ -117,37 +119,16 @@ export default () => {
     form.resetFields();
   }
 
-  function msFormat(ms?: number): string | undefined {
-    if (!ms) return;
-
-    const HH = ~~(ms / (1000 * 60 * 60));
-    const mm = ((ms % (1000 * 60 * 60)) / (1000 * 60)).toFixed(2);
-
-    let str = "";
-
-    if (HH) {
-      str += `${HH}小时`;
-    }
-
-    if (mm) {
-      str += `${mm}分钟`;
-    }
-
-    return str;
-  }
-
   return (
     <BottomFixPanel>
       <CusFillScrollPart>
         <Spin spinning={loading} wrapperClassName="cus-spin">
           {statistic.length
             ? statistic.map((record: StatisticSchema) => {
-              const tag = tags.find((t: TagSchema) =>
-                t._id.$oid === record._id.$oid
-              );
+              const tag = tags.find((t: TagSchema) => t.id === record.id);
               const ratio = (record.deration / total * 100).toFixed(2);
               return <RecordItem
-                key={record._id.$oid}
+                key={record.id}
                 ratio={ratio}
                 color={tag?.color}
               >
@@ -157,7 +138,7 @@ export default () => {
                     {ratio}%
                   </div>
                   <div className="extra">
-                    {msFormat(record.deration)}
+                    {nsFormat(record.deration)}
                   </div>
                 </div>
               </RecordItem>;

@@ -3,17 +3,18 @@ import { useDispatch, useSelector } from "react-redux";
 
 import styled from "styled-components";
 
-import { Button, Input, Form, Spin, Empty } from "antd";
+import { Button, Empty, Form, Input, Spin } from "antd";
 
 import { BottomFixPanel, FillScrollPart } from "@/layouts/";
 import TagMgt, { CusTag } from "@/components/TagMgt";
 
 import type { RecordSchema } from "@/models/record";
 import type { TagSchema } from "@/models/tag";
-import type { ObjectId } from "@/utils/type";
 
 import Throttle from "@/js-sdk/native/throttle";
 import OnReachBottom from "@/js-sdk/native/onReachBottom";
+
+import { nsFormat } from "@/utils/goTime";
 
 import theme from "@/theme";
 import moment from "moment";
@@ -107,7 +108,7 @@ export default () => {
     try {
       if (curId) {
         await dispatch(
-          { type: "record/update", payload: { ...values, _id: curId } },
+          { type: "record/update", payload: { ...values, id: curId } },
         );
         setCurId("");
       } else {
@@ -123,34 +124,13 @@ export default () => {
   }
 
   async function checked(record: RecordSchema) {
-    form.setFieldsValue(
-      { ...record, tid: record.tid?.map((t: ObjectId) => t.$oid) },
-    );
-    setCurId(record._id.$oid);
+    form.setFieldsValue(record);
+    setCurId(record.id);
   }
 
   function cancel() {
     form.resetFields();
     setCurId("");
-  }
-
-  function msFormat(ms?: number): string | undefined {
-    if (!ms) return;
-
-    const HH = ~~(ms / (1000 * 60 * 60));
-    const mm = ((ms % (1000 * 60 * 60)) / (1000 * 60)).toFixed(2);
-
-    let str = "";
-
-    if (HH) {
-      str += `${HH}小时`;
-    }
-
-    if (mm) {
-      str += `${mm}分钟`;
-    }
-
-    return str;
   }
 
   return (
@@ -177,9 +157,9 @@ export default () => {
         {list.length
           ? list.map((record: RecordSchema) => {
             return <RecordItem
-              key={record._id.$oid}
+              key={record.id}
               onClick={() => checked(record)}
-              className={`${record._id.$oid === curId ? "active" : ""}`}
+              className={`${record.id === curId ? "active" : ""}`}
             >
               <h3 style={{ color: "#333" }}>
                 {moment(record.createAt).format("YYYY-MM-DD HH:mm:ss")}
@@ -189,15 +169,12 @@ export default () => {
                   {record.event}
                 </div>
                 <div className="extra">
-                  {msFormat(record.deration)}
+                  {nsFormat(record.deration)}
                 </div>
               </div>
               <div>
-                {record?.tid?.map((tag: ObjectId) => {
-                  const oid = tag.$oid;
-                  const findTag = tags.find((t: TagSchema) =>
-                    t._id.$oid === oid
-                  );
+                {record?.tid?.map((oid: string) => {
+                  const findTag = tags.find((t: TagSchema) => t.id === oid);
 
                   return <CusTag
                     key={oid}

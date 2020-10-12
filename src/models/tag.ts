@@ -1,8 +1,8 @@
 import { ModalSchma } from "@/models/global";
-import { ObjectId } from "@/utils/type";
+
 import { RESTful } from "@/http";
 export interface TagSchema {
-  _id: ObjectId;
+  id: string;
   name: string;
   color: string;
   createAt: Date;
