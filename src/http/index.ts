@@ -6,7 +6,7 @@ import proxyCfg from "./proxyCfg";
 
 import axios from "axios";
 
-import type { AxiosResponse, AxiosRequestConfig, Method } from "axios";
+import type { AxiosRequestConfig, AxiosResponse, Method } from "axios";
 
 declare global {
   interface Window {

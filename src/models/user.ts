@@ -48,7 +48,6 @@ const UserModal: ModalSchma = {
         },
       });
       localStorage.clear();
-      location.replace(`${window.routerBase}user`);
     },
   },
   subscriptions: {
