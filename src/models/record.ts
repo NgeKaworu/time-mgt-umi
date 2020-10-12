@@ -96,7 +96,13 @@ const TagModal: ModalSchma = {
       history.listen(async ({ pathname }) => {
         try {
           if (pathname.includes("/record")) {
-            await dispatch({ type: "list" });
+            await dispatch({
+              type: "list",
+              params: {
+                skip: 0,
+                limit: 10,
+              },
+            });
           }
         } catch (e) {
           console.error("init list error", e);
