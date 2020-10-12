@@ -180,7 +180,7 @@ export default function TagMgt(props?: TagMgtProps) {
       },
     }).Execute();
   }
-  console.log(list);
+  
   return <Spin spinning={loading}>
     <div style={{ borderBottom: "1px solid #e9e9e9" }}>
       <Checkbox
