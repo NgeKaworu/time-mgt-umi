@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import styled from "styled-components";
@@ -11,7 +11,6 @@ import TagMgt, { CusTag } from "@/components/TagMgt";
 import type { RecordSchema } from "@/models/record";
 import type { TagSchema } from "@/models/tag";
 
-import Throttle from "@/js-sdk/native/throttle";
 import OnReachBottom from "@/js-sdk/native/onReachBottom";
 
 import { nsFormat } from "@/utils/goTime";
@@ -104,6 +103,9 @@ export default () => {
 
   const [curId, setCurId] = useState("");
 
+  const last = useRef(0);
+  const timer = useRef(0);
+
   async function submit(values: any) {
     try {
       if (curId) {
@@ -142,16 +144,28 @@ export default () => {
           // you should call event.persist() on the event.
           e.persist();
           // 触底
-          OnReachBottom(
-            // 节流
-            Throttle(async () => {
+          const fn = OnReachBottom(
+            async () => {
               try {
                 await dispatch({ type: "record/nextPage" });
-              } catch (e) {
-                console.error(e);
+              } catch (err) {
+                console.error(err);
               }
-            }, 2000),
-          )(e, 200);
+            },
+            30,
+          );
+          const now = Date.now();
+          // 节流
+          if (last.current && now < last.current + 300) {
+            clearTimeout(timer.current);
+            timer.current = setTimeout(() => {
+              last.current = now;
+              fn(e);
+            });
+          } else {
+            last.current = now;
+            fn(e);
+          }
         }}
       >
         {list.length
