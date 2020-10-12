@@ -163,7 +163,7 @@ export default () => {
               柳比歇夫工作法
             </a>
             <Divider type="vertical" />
-            <a href="https://furan.xyz/" target="_blank">同步博客</a>
+            <a href="https://furan.xyz/search/?s=柳比歇夫时间管理" target="_blank">同步博客</a>
             <Divider type="vertical" />
             <a
               href="https://github.com/NgeKaworu/time-mgt-umi3"
