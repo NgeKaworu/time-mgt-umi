@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import styled from "styled-components";
@@ -37,11 +37,6 @@ export default function TagMgt(props?: TagMgtProps) {
     onChange = () => {},
   } = props || {};
 
-  const [checkAll, setCheckAll] = useState({
-    checked: false,
-    indeterminate: false,
-  });
-
   const { list, loading } = useSelector((s: rootState) => ({
     list: s.tag.list,
     loading: s.loading.models.tag,
@@ -49,11 +44,12 @@ export default function TagMgt(props?: TagMgtProps) {
 
   const tagExec = TagExec();
   const dispatch = useDispatch();
+
   useLayoutEffect(() => {
     return () => {
       tagExec.Destroy();
     };
-  });
+  }, [tagExec]);
 
   const holdHandler = useRef(0);
 
@@ -184,21 +180,13 @@ export default function TagMgt(props?: TagMgtProps) {
   return <Spin spinning={loading}>
     <div style={{ borderBottom: "1px solid #e9e9e9" }}>
       <Checkbox
-        checked={checkAll.checked}
-        indeterminate={checkAll.indeterminate}
+        checked={list.length === value.length}
+        indeterminate={value.length > 0 && value.length < list.length}
         onChange={() => {
           if (list.length === value.length) {
             onChange([]);
-            setCheckAll({
-              checked: false,
-              indeterminate: false,
-            });
           } else {
             onChange(list.map((l) => l.id));
-            setCheckAll({
-              checked: true,
-              indeterminate: false,
-            });
           }
         }}
       >
@@ -232,26 +220,6 @@ export default function TagMgt(props?: TagMgtProps) {
             ? value.filter((v: string) => v !== id)
             : value.concat(id);
           onChange(temp);
-          if (temp.length > 0 && temp.length < list.length) {
-            setCheckAll({
-              checked: false,
-              indeterminate: true,
-            });
-          }
-
-          if (temp.length === list.length) {
-            setCheckAll({
-              checked: true,
-              indeterminate: false,
-            });
-          }
-
-          if (temp.length === 0) {
-            setCheckAll({
-              checked: false,
-              indeterminate: false,
-            });
-          }
         }}
         closable
         onClose={(e: React.MouseEvent<HTMLElement, MouseEvent>) =>
