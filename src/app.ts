@@ -3,7 +3,7 @@ export const dva = {
     onError(err: ErrorEvent) {
       // 继续传播
       // err.preventDefault();
-      console.error("in dva", err.message);
+      console.error('in dva', err.message);
     },
   },
 };

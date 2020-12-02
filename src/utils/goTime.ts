@@ -11,11 +11,12 @@ export function nsFormat(nanosecond?: Duration): string | undefined {
   if (!nanosecond) return;
 
   const HH = ~~(nanosecond / (1000 * 1000 * 1000 * 60 * 60));
-  const mm =
-    ((nanosecond % (1000 * 1000 * 1000 * 60 * 60)) / (1000 * 1000 * 1000 * 60))
-      .toFixed(2);
+  const mm = (
+    (nanosecond % (1000 * 1000 * 1000 * 60 * 60)) /
+    (1000 * 1000 * 1000 * 60)
+  ).toFixed(2);
 
-  let str = "";
+  let str = '';
 
   if (HH) {
     str += `${HH}小时`;

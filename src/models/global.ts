@@ -1,4 +1,4 @@
-import { Subscription, Effect, Reducer } from "umi";
+import { Subscription, Effect, Reducer } from 'umi';
 
 export interface ModalSchma {
   namespace?: string;

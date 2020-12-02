@@ -1,6 +1,6 @@
-import { ModalSchma } from "@/models/global";
+import { ModalSchma } from '@/models/global';
 
-import { RESTful } from "@/http";
+import { RESTful } from '@/http';
 export interface UserSchema {
   id?: string;
   name?: string;
@@ -23,23 +23,22 @@ const UserModal: ModalSchma = {
   },
   effects: {
     *profile(_, { put }) {
-      const { data } = yield RESTful.get(
-        "/main/profile",
-        { silence: "success" },
-      );
-      yield put({ type: "save", payload: data });
+      const { data } = yield RESTful.get('/main/profile', {
+        silence: 'success',
+      });
+      yield put({ type: 'save', payload: data });
     },
     *login({ payload }) {
-      const { data } = yield RESTful.post("/main/login", { data: payload });
-      localStorage.setItem("token", data);
+      const { data } = yield RESTful.post('/main/login', { data: payload });
+      localStorage.setItem('token', data);
     },
     *register({ payload }) {
-      const { data } = yield RESTful.post("/main/register", { data: payload });
-      localStorage.setItem("token", data);
+      const { data } = yield RESTful.post('/main/register', { data: payload });
+      localStorage.setItem('token', data);
     },
     *logout(_, { put }) {
       yield put({
-        type: "save",
+        type: 'save',
         payload: {
           id: undefined,
           name: undefined,
@@ -54,12 +53,12 @@ const UserModal: ModalSchma = {
     setup({ history, dispatch }): void {
       // Subscribe history(url) change, trigger `load` action if pathname is `/`
       if (
-        history.location.pathname.includes("/user") &&
-        !localStorage.getItem("token")
+        history.location.pathname.includes('/user') &&
+        !localStorage.getItem('token')
       ) {
         return;
       }
-      dispatch({ type: "profile" });
+      dispatch({ type: 'profile' });
     },
   },
 };

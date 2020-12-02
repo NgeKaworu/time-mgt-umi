@@ -90,7 +90,7 @@ function TagModForm(props: TagProp) {
 
       <Button htmlType="submit" style={{ display: "none" }}>
         提交
-      </Button>,
+      </Button>
     </Form>
   </Modal>;
 }
