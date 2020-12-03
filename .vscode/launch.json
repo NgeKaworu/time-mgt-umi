@@ -11,7 +11,10 @@
       "request": "attach",
       "type": "pwa-chrome",
       "webRoot": "${workspaceFolder}",
-      "skipFiles": ["${workspaceFolder}/node_modules/**"]
+      "skipFiles": [
+        "${workspaceFolder}/node_modules/**/*.js"
+        // "${workspaceFolder}/yourLibToSkip/**/*.js"
+      ]
     }
   ]
 }
