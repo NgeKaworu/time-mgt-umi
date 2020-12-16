@@ -1,9 +1,10 @@
 import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useInfiniteQuery, useQueryClient } from "react-query";
 
 import styled from "styled-components";
 
-import { Button, Empty, Form, Input, Spin } from "antd";
+import { Button, Empty, Form, Input, message, Spin } from "antd";
 
 import { BottomFixPanel, FillScrollPart } from "@/layouts/";
 import TagMgt, { CusTag } from "@/components/TagMgt";
@@ -18,10 +19,9 @@ import { nsFormat } from "@/utils/goTime";
 import theme from "@/theme";
 import moment from "moment";
 
+import { RESTful } from "@/http";
+
 interface rootState {
-  record: {
-    list: RecordSchema[];
-  };
   tag: {
     list: TagSchema[];
   };
@@ -94,8 +94,7 @@ const RecordItem = styled.div`
 
 export default () => {
   const [form] = Form.useForm();
-  const { list, loading, tags } = useSelector((s: rootState) => ({
-    list: s.record.list,
+  const { loading, tags } = useSelector((s: rootState) => ({
     loading: s.loading.models.record,
     tags: s.tag.list,
   }));
@@ -105,6 +104,26 @@ export default () => {
 
   const last = useRef(0);
   const timer = useRef(0);
+  const queryClient = useQueryClient();
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+  } = useInfiniteQuery("records", ({ pageParam = 0 }) => {
+    return RESTful.get("/main/v1/record/list", {
+      silence: "success",
+      params: {
+        skip: pageParam * 10,
+        limit: 10,
+      },
+    });
+  }, {
+    getNextPageParam: (lastPage, pages) => {
+      return lastPage?.data?.length === 10 ? pages?.length : undefined;
+    },
+  });
 
   async function submit(values: any) {
     try {
@@ -118,7 +137,8 @@ export default () => {
           { type: "record/add", payload: values },
         );
       }
-      await dispatch({ type: "record/list" });
+
+      queryClient.invalidateQueries("records");
       form.resetFields();
     } catch (e) {
       console.error("create err: ", e);
@@ -145,11 +165,11 @@ export default () => {
           e.persist();
           // 触底
           const fn = OnReachBottom(
-            async () => {
-              try {
-                await dispatch({ type: "record/nextPage" });
-              } catch (err) {
-                console.error(err);
+            () => {
+              if (hasNextPage) {
+                fetchNextPage();
+              } else {
+                message.warn({ content: "没有更多了" });
               }
             },
             30,
@@ -168,40 +188,42 @@ export default () => {
           }
         }}
       >
-        {list.length
-          ? list.map((record: RecordSchema) => {
-            return <RecordItem
-              key={record.id}
-              onClick={() => checked(record)}
-              className={`${record.id === curId ? "active" : ""}`}
-            >
-              <h3 style={{ color: "#333" }}>
-                {moment(record.createAt).format("YYYY-MM-DD HH:mm:ss")}
-              </h3>
-              <div className="content">
-                <div className="main">
-                  {record.event}
+        {data?.pages?.length
+          ? data?.pages?.map((gorup) =>
+            gorup?.data?.map((record: RecordSchema) => {
+              return <RecordItem
+                key={record.id}
+                onClick={() => checked(record)}
+                className={`${record.id === curId ? "active" : ""}`}
+              >
+                <h3 style={{ color: "#333" }}>
+                  {moment(record.createAt).format("YYYY-MM-DD HH:mm:ss")}
+                </h3>
+                <div className="content">
+                  <div className="main">
+                    {record.event}
+                  </div>
+                  <div className="extra">
+                    {nsFormat(record.deration)}
+                  </div>
                 </div>
-                <div className="extra">
-                  {nsFormat(record.deration)}
-                </div>
-              </div>
-              <div>
-                {record?.tid?.map((oid: string) => {
-                  const findTag = tags.find((t: TagSchema) => t.id === oid);
+                <div>
+                  {record?.tid?.map((oid: string) => {
+                    const findTag = tags.find((t: TagSchema) => t.id === oid);
 
-                  return <CusTag
-                    key={oid}
-                    color={findTag?.color}
-                  >
-                    {findTag?.name}
-                  </CusTag>;
-                })}
-              </div>
-            </RecordItem>;
-          })
+                    return <CusTag
+                      key={oid}
+                      color={findTag?.color}
+                    >
+                      {findTag?.name}
+                    </CusTag>;
+                  })}
+                </div>
+              </RecordItem>;
+            })
+          )
           : <CusEmpty />}
-        <Spin spinning={loading} wrapperClassName="cus-spin"></Spin>
+        <Spin spinning={isFetching} wrapperClassName="cus-spin"></Spin>
       </CusFillScrollPart>
       <Form onFinish={submit} form={form}>
         <BottomFixPanel

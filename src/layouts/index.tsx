@@ -1,4 +1,5 @@
 import React from "react";
+import { QueryClient, QueryClientProvider } from "react-query";
 import type { PropsWithChildren } from "react";
 import styled from "styled-components";
 
@@ -10,10 +11,11 @@ import {
   PieChartOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { useLocation, useHistory } from "react-router";
+import { useHistory, useLocation } from "react-router";
 
 import zhCN from "antd/es/locale/zh_CN";
 
+const queyClient = new QueryClient();
 export const BottomFixPanel = styled.div`
     height:100%;
     display: flex;
@@ -71,23 +73,25 @@ const menu = [
 export default (props: PropsWithChildren<any>) => {
   const { pathname } = useLocation();
   const history = useHistory();
-  return <ConfigProvider locale={zhCN}>
-    <BottomFixPanel>
-      <FillScrollPart>
-        {props.children}
-      </FillScrollPart>
-      <BottomMenu>
-        {menu.map((i) =>
-          <MenuItem
-            key={i.path}
-            active={i.path.includes(pathname)}
-            onClick={() => history.push(i.path)}
-          >
-            {i.icon}
-            {i.title}
-          </MenuItem>
-        )}
-      </BottomMenu>
-    </BottomFixPanel>
-  </ConfigProvider>;
+  return <QueryClientProvider client={queyClient}>
+    <ConfigProvider locale={zhCN}>
+      <BottomFixPanel>
+        <FillScrollPart>
+          {props.children}
+        </FillScrollPart>
+        <BottomMenu>
+          {menu.map((i) =>
+            <MenuItem
+              key={i.path}
+              active={i.path.includes(pathname)}
+              onClick={() => history.push(i.path)}
+            >
+              {i.icon}
+              {i.title}
+            </MenuItem>
+          )}
+        </BottomMenu>
+      </BottomFixPanel>
+    </ConfigProvider>
+  </QueryClientProvider>;
 };
