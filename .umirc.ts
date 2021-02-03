@@ -19,15 +19,11 @@ export default defineConfig({
     },
   ],
   theme,
-  hash: true,
   title: '柳比歇夫时间管理法',
-  base: '/time-mgt',
-  publicPath: '/time-mgt/',
-  runtimePublicPath: true,
+
   dynamicImport: {
     loading: '@/Loading',
   },
-  favicon: './assets/favicon.ico',
   analyze: {
     analyzerMode: 'server',
     analyzerPort: 8888,
@@ -38,10 +34,12 @@ export default defineConfig({
     logLevel: 'info',
     defaultSizes: 'parsed', // stat  // gzip
   },
+  hash: true,
+  base: '/time-mgt',
+  publicPath: '/time-mgt/',
+  runtimePublicPath: true,
   externals: {
     moment: 'moment',
   },
-  scripts: [
-    'https://lib.baomitu.com/moment.js/latest/moment.min.js',
-  ]
+  scripts: ['https://lib.baomitu.com/moment.js/latest/moment.min.js'],
 });
