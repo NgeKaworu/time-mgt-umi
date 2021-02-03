@@ -3,6 +3,6 @@ export const mainHost = () => {
     case 'production':
       return 'https://api.furan.xyz/time-mgt';
     default:
-      return 'http://localhost:8000';
+      return 'http://localhost:8030';
   }
 };
