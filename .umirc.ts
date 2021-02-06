@@ -13,8 +13,7 @@ export default defineConfig({
         { path: '/', redirect: '/record/' },
         { path: '/record/', component: 'record' },
         { path: '/statistic/', component: 'statistic' },
-        { path: '/user/', component: 'user' },
-        { redirect: '/record/' },
+        // { redirect: '/record/' },
       ],
     },
   ],
@@ -42,4 +41,15 @@ export default defineConfig({
     moment: 'moment',
   },
   scripts: ['https://lib.baomitu.com/moment.js/latest/moment.min.js'],
+  qiankun: {
+    slave: {},
+  },
+  extraBabelPlugins: [
+    [
+      'babel-plugin-styled-components',
+      {
+        namespace: 'flashcard',
+      },
+    ],
+  ],
 });

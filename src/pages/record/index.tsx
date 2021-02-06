@@ -19,7 +19,7 @@ import { nsFormat } from "@/utils/goTime";
 import theme from "@/theme";
 import moment from "moment";
 
-import { RESTful } from "@/http";
+import { RESTful } from "@/http/";
 
 interface rootState {
   tag: {

@@ -100,7 +100,7 @@ function request(url: string, options: BizOptions = {}) {
         content: "请先登录",
         onClose: () => {
           localStorage.clear();
-          location.replace(`${window.routerBase}/user/`);
+          location.replace(`/user-center/login/`);
         },
       });
     }
