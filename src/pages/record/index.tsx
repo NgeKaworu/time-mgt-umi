@@ -257,9 +257,6 @@ export default () => {
                 flex: 1,
               }}
               name="event"
-              rules={[
-                { required: true, message: "请记录做了什么" },
-              ]}
             >
               <Input placeholder="请记录做了什么" allowClear autoComplete="off">
               </Input>
