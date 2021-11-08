@@ -1,6 +1,6 @@
 import { ModalSchma } from '@/models/global';
 
-import { RESTful } from '@/http';
+import { restful as RESTful } from '@/http';
 export interface TagSchema {
   id: string;
   name: string;
@@ -20,17 +20,17 @@ const TagModal: ModalSchma = {
   },
   effects: {
     *add({ payload }) {
-      return yield RESTful.post('/main/v1/tag/create', { data: payload });
+      return yield RESTful.post('time-mgt/tag/create', payload);
     },
     *delete({ payload }) {
-      return yield RESTful.delete(`/main/v1/tag/${payload}`);
+      return yield RESTful.delete(`time-mgt/tag/${payload}`);
     },
     *update({ payload }) {
-      return yield RESTful.put('/main/v1/tag/update', { data: payload });
+      return yield RESTful.put('time-mgt/tag/update', payload);
     },
     *list(_, { put }) {
-      const { data } = yield RESTful.get('/main/v1/tag/list', {
-        silence: 'success',
+      const { data } = yield RESTful.get('time-mgt/tag/list', {
+        notify: 'fail'
       });
       return yield put({ type: 'save', payload: { list: data } });
     },

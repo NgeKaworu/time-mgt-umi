@@ -1,6 +1,6 @@
 import { ModalSchma } from '@/models/global';
 
-import { RESTful } from '@/http';
+import { restful as RESTful } from '@/http';
 import { message } from 'antd';
 import moment from 'moment';
 
@@ -39,18 +39,18 @@ const TagModal: ModalSchma = {
   },
   effects: {
     *add({ payload }) {
-      return yield RESTful.post('/main/v1/record/create', { data: payload });
+      return yield RESTful.post('time-mgt/record/create', payload);
     },
     *delete({ payload }) {
-      return yield RESTful.delete(`/main/v1/record/${payload}`);
+      return yield RESTful.delete(`time-mgt/record/${payload}`);
     },
     *update({ payload }) {
-      return yield RESTful.put('/main/v1/record/update', { data: payload });
+      return yield RESTful.put('time-mgt/record/update', payload);
     },
     *statistic({ payload }, { put }) {
-      const { data } = yield RESTful.post('/main/v1/record/statistic', {
-        data: payload,
-        silence: 'success',
+      const { data } = yield RESTful.post('time-mgt/record/statistic', payload, {
+
+        notify: 'fail'
       });
       return yield put({ type: 'save', payload: { statistic: data } });
     },
