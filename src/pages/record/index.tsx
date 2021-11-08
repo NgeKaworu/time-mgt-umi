@@ -19,7 +19,7 @@ import { nsFormat } from "@/utils/goTime";
 import theme from "@/theme";
 import moment from "moment";
 
-import { RESTful } from "@/http";
+import { RESTful } from "@/http/";
 
 interface rootState {
   tag: {
@@ -112,7 +112,7 @@ export default () => {
     hasNextPage,
     isFetching,
   } = useInfiniteQuery("records", ({ pageParam = 0 }) => {
-    return RESTful.get("/main/v1/record/list", {
+    return RESTful.get("time-mgt/record/list", {
       silence: "success",
       params: {
         skip: pageParam * 10,

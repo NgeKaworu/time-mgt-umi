@@ -9,7 +9,6 @@ import theme from "@/theme/";
 import {
   FormOutlined,
   PieChartOutlined,
-  UserOutlined,
 } from "@ant-design/icons";
 import { useHistory, useLocation } from "react-router";
 
@@ -67,7 +66,6 @@ const MenuItem = styled.div<MenuItemProps>`
 const menu = [
   { title: "记录", path: "/record/", icon: <FormOutlined /> },
   { title: "统计", path: "/statistic/", icon: <PieChartOutlined /> },
-  { title: "我的", path: "/user/", icon: <UserOutlined /> },
 ];
 
 export default (props: PropsWithChildren<any>) => {

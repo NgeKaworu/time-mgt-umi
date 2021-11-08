@@ -1,10 +1,10 @@
 import { defineConfig } from 'umi';
-import theme from './src/theme/';
+import base from './.umirc.default';
 
 export default defineConfig({
-  nodeModulesTransform: {
-    type: 'none',
-  },
+  ...base,
+  dva: {},
+  title: '柳比歇夫时间管理法',
   routes: [
     {
       path: '/',
@@ -13,33 +13,31 @@ export default defineConfig({
         { path: '/', redirect: '/record/' },
         { path: '/record/', component: 'record' },
         { path: '/statistic/', component: 'statistic' },
-        { path: '/user/', component: 'user' },
-        { redirect: '/record/' },
+        // { redirect: '/record/' },
       ],
     },
   ],
-  theme,
-  title: '柳比歇夫时间管理法',
+  devServer: {
+    port: 80,
+    proxy: {
+      '/api/time-mgt': {
+        target: 'http://time-mgt-go-dev',
+        changeOrigin: true,
+        pathRewrite: {
+          '/api/time-mgt': '',
+        },
+      },
+    },
+  },
 
-  dynamicImport: {
-    loading: '@/Loading',
-  },
-  analyze: {
-    analyzerMode: 'server',
-    analyzerPort: 8888,
-    openAnalyzer: true,
-    // generate stats file while ANALYZE_DUMP exist
-    generateStatsFile: false,
-    statsFilename: 'stats.json',
-    logLevel: 'info',
-    defaultSizes: 'parsed', // stat  // gzip
-  },
-  hash: true,
-  base: '/time-mgt',
-  publicPath: '/time-mgt/',
-  runtimePublicPath: true,
-  externals: {
-    moment: 'moment',
-  },
-  scripts: ['https://lib.baomitu.com/moment.js/latest/moment.min.js'],
+  base: '/micro/time-mgt',
+  publicPath: '/micro/time-mgt/',
+  extraBabelPlugins: [
+    [
+      'babel-plugin-styled-components',
+      {
+        namespace: 'time-mgt',
+      },
+    ],
+  ],
 });
