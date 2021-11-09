@@ -39,16 +39,16 @@ const TagModal: ModalSchma = {
   },
   effects: {
     *add({ payload }) {
-      return yield RESTful.post('time-mgt/record/create', payload);
+      return yield RESTful.post('time-mgt/v1/record/create', payload);
     },
     *delete({ payload }) {
       return yield RESTful.delete(`time-mgt/record/${payload}`);
     },
     *update({ payload }) {
-      return yield RESTful.put('time-mgt/record/update', payload);
+      return yield RESTful.put('time-mgt/v1/record/update', payload);
     },
     *statistic({ payload }, { put }) {
-      const { data } = yield RESTful.post('time-mgt/record/statistic', payload, {
+      const { data } = yield RESTful.post('time-mgt/v1/record/statistic', payload, {
 
         notify: 'fail'
       });

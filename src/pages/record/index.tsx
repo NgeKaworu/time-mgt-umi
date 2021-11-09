@@ -112,7 +112,7 @@ export default () => {
     hasNextPage,
     isFetching,
   } = useInfiniteQuery("records", ({ pageParam = 0 }) => {
-    return RESTful.get("time-mgt/record/list", {
+    return RESTful.get("time-mgt/v1/record/list", {
       silence: "success",
       params: {
         skip: pageParam * 10,
