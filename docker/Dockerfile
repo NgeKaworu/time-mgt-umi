@@ -4,12 +4,12 @@ RUN mkdir -p /home/node/app
 
 WORKDIR /home/node/app
 
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json yarn.lock ./
 RUN yarn --frozen-lockfile
 
 COPY . .
 
-RUN npm run build
+RUN yarn build
 
 FROM nginx:stable-alpine
 

@@ -1,5 +1,7 @@
 #!/bin/bash
 set -e
 
-docker build -f ./Dockerfile -t ngekaworu/time-mgt-umi ..;
-docker push ngekaworu/time-mgt-umi;
+tag=ngekaworu/time-mgt-umi
+
+docker build --file ./Dockerfile --tag ${tag} ..;
+docker push ${tag};
