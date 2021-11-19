@@ -1,13 +1,15 @@
-import React, { cloneElement, useEffect } from 'react';
-import type { Attributes, ReactNode } from 'react';
+import React, { ReactElement } from 'react';
 
-import { Form, Modal, Button, Input } from 'antd';
+import { Form, Input } from 'antd';
 
-import { SketchPicker } from 'react-color';
+import { SketchPicker, SketchPickerProps } from 'react-color';
 
 import ModalForm from '@/js-sdk/components/ModalForm';
 import useModalForm from '@/js-sdk/components/ModalForm/useModalForm';
 import { add, update } from '../services';
+import { compose } from '@/js-sdk/decorators/utils';
+import { IOC } from '@/js-sdk/decorators/hoc';
+import Format from '@/js-sdk/decorators/Format';
 
 const { Item } = Form;
 export function TagModForm({
@@ -31,7 +33,7 @@ export function TagModForm({
     } catch (e) {
       console.error(e);
     } finally {
-      setModalProps((pre) => ({ ...pre, confirmLoading: true }));
+      setModalProps((pre) => ({ ...pre, confirmLoading: false }));
     }
   }
 
@@ -53,24 +55,33 @@ export function TagModForm({
         rules={[{ required: true, message: '请选个颜色' }]}
         label="颜色"
       >
-        <SketchPicker
-          width="unset"
-          disableAlpha
-          presetColors={[
-            '#f5222d',
-            '#fa541c',
-            '#fa8c16',
-            '#faad14',
-            '#fadb14',
-            '#a0d911',
-            '#52c41a',
-            '#13c2c2',
-            '#1890ff',
-            '#2f54eb',
-            '#722ed1',
-            '#eb2f96',
-          ]}
-        />
+        {compose<ReactElement<SketchPickerProps>>(
+          IOC([
+            Format({
+              valuePropName: 'color',
+              f: (obj: any) => obj?.hex,
+            }),
+          ]),
+        )(
+          <SketchPicker
+            width="unset"
+            disableAlpha
+            presetColors={[
+              '#f5222d',
+              '#fa541c',
+              '#fa8c16',
+              '#faad14',
+              '#fadb14',
+              '#a0d911',
+              '#52c41a',
+              '#13c2c2',
+              '#1890ff',
+              '#2f54eb',
+              '#722ed1',
+              '#eb2f96',
+            ]}
+          />,
+        )}
       </Item>
     </ModalForm>
   );

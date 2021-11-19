@@ -3,7 +3,7 @@ import { useInfiniteQuery, useQueryClient, useQuery } from 'react-query';
 
 import styled from 'styled-components';
 
-import { Button, Empty, Form, Input, Spin } from 'antd';
+import { Button, Card, Empty, Form, Input, Skeleton, Spin } from 'antd';
 
 import { BottomFixPanel, FillScrollPart } from '@/layouts/';
 import TagMgt, { CusTag } from '@/components/TagMgt';
@@ -18,7 +18,9 @@ import moment from 'moment';
 
 import { restful as RESTful } from '@/js-sdk/utils/http';
 import useTagList from '@/components/TagMgt/hooks/useTagList';
-import { add, update } from './services';
+import { add, update, page } from './services';
+
+import { WindowScroller, List, InfiniteLoader, ListProps } from 'react-virtualized';
 
 const InputBar = styled.div`
   display: flex;
@@ -94,8 +96,11 @@ export default () => {
   const { data, fetchNextPage, hasNextPage, isFetching } = useInfiniteQuery(
     'records',
     ({ pageParam = 0 }) => {
-      return RESTful.get('time-mgt/v1/record/list', {
-        notify: 'fail',
+      return page<
+        { data: RecordSchema[]; total: number },
+        { data: RecordSchema[]; total: number },
+        any
+      >({
         params: {
           skip: pageParam * 10,
           limit: 10,
@@ -108,6 +113,10 @@ export default () => {
       },
     },
   );
+
+  const list = data?.pages,
+    pages = list?.reduce((acc: RecordSchema[], cur) => acc.concat(cur?.data), []),
+    total = list?.[list?.length - 1]?.total || 0;
 
   async function submit(values: any) {
     try {
@@ -135,39 +144,84 @@ export default () => {
     setCurId('');
   }
 
+  // react-window-infinite
+  // const length = pages?.length || 0;
+  // If there are more items to be loaded then add an extra row to hold a loading indicator.
+  // const itemCount = hasNextPage ? length + 1 : length;
+
+  // Only load 1 page of items at a time.
+  // Pass an empty callback to InfiniteLoader in case it asks us to load more than once.
+  const loadMoreItems = () => (isFetching ? Promise.resolve() : fetchNextPage());
+
+  // Every row is loaded except for our loading indicator row.
+  // const isItemLoaded = index => !hasNextPage || index < pages.length;
+  const isItemLoaded = ({ index }: { index: number }) => !hasNextPage || index < pages?.length;
+
+  // Render an item or a loading indicator.
+  const renderItem: ListProps['rowRenderer'] = ({ index, style }) => {
+    const record: RecordSchema = pages?.[index];
+
+    return (
+      <div style={{ ...style, padding: '6px 0' }} key={record?.id}>
+        {isItemLoaded({ index }) ? (
+          <RecordItem
+            key={record.id}
+            onClick={() => checked(record)}
+            className={`${record.id === curId ? 'active' : ''}`}
+          >
+            <h3 style={{ color: '#333' }}>
+              {moment(record.createAt).format('YYYY-MM-DD HH:mm:ss')}
+            </h3>
+            <div className="content">
+              <div className="main">{record.event}</div>
+              <div className="extra">{nsFormat(record.deration)}</div>
+            </div>
+            <div>
+              {record?.tid?.map((oid: string) => {
+                const findTag = tags.find((t: TagSchema) => t.id === oid);
+
+                return (
+                  <CusTag key={oid} color={findTag?.color}>
+                    {findTag?.name}
+                  </CusTag>
+                );
+              })}
+            </div>
+          </RecordItem>
+        ) : (
+          <Card style={{ margin: '12px' }}>
+            <Skeleton />
+          </Card>
+        )}
+      </div>
+    );
+  };
+
   return (
     <BottomFixPanel>
-      {data?.pages?.length ? (
-        data?.pages?.map((group) =>
-          group?.data?.map((record: RecordSchema) => {
-            return (
-              <RecordItem
-                key={record.id}
-                onClick={() => checked(record)}
-                className={`${record.id === curId ? 'active' : ''}`}
-              >
-                <h3 style={{ color: '#333' }}>
-                  {moment(record.createAt).format('YYYY-MM-DD HH:mm:ss')}
-                </h3>
-                <div className="content">
-                  <div className="main">{record.event}</div>
-                  <div className="extra">{nsFormat(record.deration)}</div>
-                </div>
-                <div>
-                  {record?.tid?.map((oid: string) => {
-                    const findTag = tags.find((t: TagSchema) => t.id === oid);
-
-                    return (
-                      <CusTag key={oid} color={findTag?.color}>
-                        {findTag?.name}
-                      </CusTag>
-                    );
-                  })}
-                </div>
-              </RecordItem>
-            );
-          }),
-        )
+      {pages?.length ? (
+        <InfiniteLoader isRowLoaded={isItemLoaded} rowCount={total} loadMoreRows={loadMoreItems}>
+          {({ onRowsRendered, registerChild }) => (
+            <WindowScroller>
+              {({ registerChild: winRef, ...winProps }) => (
+                <List
+                  autoHeight
+                  style={{
+                    background: '#f0f2f5',
+                    paddingTop: '58px',
+                    paddingBottom: '128px',
+                  }}
+                  {...winProps}
+                  ref={(ref) => registerChild(winRef(ref))}
+                  rowCount={total}
+                  onRowsRendered={onRowsRendered}
+                  rowHeight={200}
+                  rowRenderer={renderItem}
+                />
+              )}
+            </WindowScroller>
+          )}
+        </InfiniteLoader>
       ) : (
         <CusEmpty />
       )}

@@ -23,7 +23,8 @@ export const CusTag = styled(Tag)`
 `;
 
 export default function TagMgt(props?: TagMgtProps) {
-  const { data: list, isFetching: loading } = useTagList(),
+  const { data, isFetching: loading, refetch } = useTagList(),
+    list = data?.data,
     { value = [], onChange = () => {} } = props || {},
     editor = useModalForm(),
     holdHandler = useRef(0);
@@ -63,7 +64,7 @@ export default function TagMgt(props?: TagMgtProps) {
   }
 
   function onSuccess() {
-    dataSource?.refetch();
+    refetch();
   }
 
   return (
@@ -73,13 +74,13 @@ export default function TagMgt(props?: TagMgtProps) {
       <Spin spinning={loading}>
         <div style={{ borderBottom: '1px solid #e9e9e9' }}>
           <Checkbox
-            checked={list.length === value.length}
-            indeterminate={value.length > 0 && value.length < list.length}
+            checked={list?.length === value.length}
+            indeterminate={value?.length > 0 && value?.length < list?.length}
             onChange={() => {
-              if (list.length === value.length) {
+              if (list?.length === value?.length) {
                 onChange([]);
               } else {
-                onChange(list.map((l) => l.id));
+                onChange(list?.map?.((l) => l.id));
               }
             }}
           >
@@ -103,7 +104,7 @@ export default function TagMgt(props?: TagMgtProps) {
           <PlusOutlined /> 新增标签
         </CusTag>
 
-        {list?.map((tag: TagSchema) => (
+        {list?.map?.((tag: TagSchema) => (
           <CusTag
             onClick={() => {
               const id = tag.id;
