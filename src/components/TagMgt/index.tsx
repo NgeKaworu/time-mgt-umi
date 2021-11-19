@@ -1,57 +1,32 @@
-import React, { useLayoutEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useLayoutEffect, useRef } from 'react';
 
-import styled from "styled-components";
+import styled from 'styled-components';
 
-import { Checkbox, Modal, Spin, Tag } from "antd";
-import { CheckCircleTwoTone, PlusOutlined } from "@ant-design/icons";
+import { Checkbox, Modal, Spin, Tag } from 'antd';
+import { CheckCircleTwoTone, PlusOutlined } from '@ant-design/icons';
 
-import TagExec from "./TagExec";
-import type { TagSchema } from "@/models/tag";
+import { page, remove } from './services';
 
-import theme from "@/theme";
-
-interface rootState {
-  loading: {
-    models: {
-      tag: boolean;
-    };
-  };
-  tag: {
-    list: TagSchema[];
-  };
-}
-
+import theme from '@/theme';
+import useModalForm from '@/js-sdk/components/ModalForm/useModalForm';
+import { useQuery } from 'react-query';
+import { TagSchema } from '@/components/TagMgt/models';
+import { TagModForm } from './components/TagExec';
+import useTagList from './hooks/useTagList';
 interface TagMgtProps {
   value?: string[];
   onChange?: Function;
 }
 
 export const CusTag = styled(Tag)`
-    margin-top: 6px !important;
+  margin-top: 6px !important;
 `;
 
 export default function TagMgt(props?: TagMgtProps) {
-  const {
-    value = [],
-    onChange = () => {},
-  } = props || {};
-
-  const { list, loading } = useSelector((s: rootState) => ({
-    list: s.tag.list,
-    loading: s.loading.models.tag,
-  }));
-
-  const tagExec = TagExec();
-  const dispatch = useDispatch();
-
-  useLayoutEffect(() => {
-    return () => {
-      tagExec.Destroy();
-    };
-  }, [tagExec]);
-
-  const holdHandler = useRef(0);
+  const { data: list, isFetching: loading } = useTagList(),
+    { value = [], onChange = () => {} } = props || {},
+    editor = useModalForm(),
+    holdHandler = useRef(0);
 
   function holdStart(callback: Function, critical = 3000) {
     holdHandler.current = setTimeout(callback, critical);
@@ -61,185 +36,100 @@ export default function TagMgt(props?: TagMgtProps) {
     clearTimeout(holdHandler.current);
   }
 
-  // 新建标签
-  async function create(formValues?: any) {
-    try {
-      const { color: { hex }, ...restValues } = formValues;
-      tagExec?.Update({
-        modalProps: {
-          confirmLoading: true,
-        },
-      }).Execute();
-      await dispatch({
-        type: "tag/add",
-        payload: {
-          color: hex,
-          ...restValues,
+  function removeHandler(id: string) {
+    return (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+      e.preventDefault();
+      Modal.confirm({
+        title: '操作不可撤销',
+        onOk: async () => {
+          await remove(id);
+          await onSuccess();
         },
       });
-      await dispatch({ type: "tag/list" });
-      tagExec?.Update({
-        modalProps: {
-          visible: false,
-        },
-      }).Execute();
-    } catch (e) {
-      console.error(e);
-    } finally {
-      tagExec?.Update({
-        modalProps: {
-          confirmLoading: false,
-        },
-      }).Execute();
-    }
-  }
-
-  // 编辑标签
-  async function edit(id: string, formValues?: any) {
-    try {
-      const { color: { hex }, ...restValues } = formValues;
-      tagExec?.Update({
-        modalProps: {
-          confirmLoading: true,
-        },
-      }).Execute();
-      await dispatch({
-        type: "tag/update",
-        payload: {
-          id,
-          color: hex || formValues?.color,
-          ...restValues,
-        },
-      });
-      await dispatch({ type: "tag/list" });
-      tagExec?.Update({
-        modalProps: {
-          visible: false,
-        },
-      }).Execute();
-    } catch (e) {
-      console.error(e);
-    } finally {
-      tagExec?.Update({
-        modalProps: {
-          confirmLoading: false,
-        },
-      }).Execute();
-    }
-  }
-
-  // 删除标签
-  async function remove(
-    id: string,
-    e: React.MouseEvent<HTMLElement, MouseEvent>,
-  ) {
-    e.preventDefault();
-    Modal.confirm({
-      title: "操作不可撤销",
-      onOk: async () => {
-        await dispatch({ type: "tag/delete", payload: id });
-        await dispatch({ type: "tag/list" });
-      },
-    });
+    };
   }
 
   // 打开新建弹窗
-  function openCreateExec() {
-    tagExec.Update({
-      modalProps: {
-        visible: true,
-        title: "新建标签",
-      },
-      onOk: create,
-      onCancel: closeExec,
-    }).Execute();
+  function addHandler() {
+    editor.setModalProps((pre) => ({ ...pre, visible: true }));
   }
 
   // 打开编辑弹窗
-  function openEditExec(tag: TagSchema) {
-    tagExec.Update({
-      modalProps: {
-        visible: true,
-        title: "编辑标签",
-      },
-      initVal: tag,
-      onOk: (v) => edit(tag.id, v),
-      onCancel: closeExec,
-    }).Execute();
+  function editHandler(t: TagSchema) {
+    return () => {
+      editor.form.setFieldsValue(t);
+      editor.setModalProps((pre) => ({ ...pre, visible: true }));
+    };
   }
 
-  // 关闭弹窗
-  function closeExec() {
-    tagExec.Update({
-      modalProps: {
-        visible: false,
-      },
-    }).Execute();
+  function onSuccess() {
+    dataSource?.refetch();
   }
 
-  return <Spin spinning={loading}>
-    <div style={{ borderBottom: "1px solid #e9e9e9" }}>
-      <Checkbox
-        checked={list.length === value.length}
-        indeterminate={value.length > 0 && value.length < list.length}
-        onChange={() => {
-          if (list.length === value.length) {
-            onChange([]);
-          } else {
-            onChange(list.map((l) => l.id));
-          }
-        }}
-      >
-        全选
-      </Checkbox>
-      <a
-        onClick={() => {
-          const inverse = list.reduce((acc: string[], cur: TagSchema) => {
-            if (!value.includes(cur.id)) {
-              return [...acc, cur.id];
-            }
-            return acc;
-          }, []);
-          onChange(inverse);
-        }}
-      >
-        反选
-      </a>
-    </div>
-    <CusTag
-      style={{ borderStyle: "dashed", background: "#fff" }}
-      onClick={openCreateExec}
-    >
-      <PlusOutlined /> 新增标签
-    </CusTag>
-    {list.map((tag: TagSchema) =>
-      <CusTag
-        onClick={() => {
-          const id = tag.id;
-          const temp = value.includes(id)
-            ? value.filter((v: string) => v !== id)
-            : value.concat(id);
-          onChange(temp);
-        }}
-        closable
-        onClose={(e: React.MouseEvent<HTMLElement, MouseEvent>) =>
-          remove(tag.id, e)}
-        key={tag.id}
-        color={tag.color}
-        onTouchStart={() => {
-          holdStart(() => openEditExec(tag), 500);
-        }}
-        onTouchEnd={holdEnd}
-        onMouseDown={() => {
-          holdStart(() => openEditExec(tag), 500);
-        }}
-        onMouseUp={holdEnd}
-      >
-        {value.includes(tag.id) &&
-          <CheckCircleTwoTone twoToneColor={theme["primary-color"]} />}
-        {" "}
-        {tag.name}
-      </CusTag>
-    )}
-  </Spin>;
+  return (
+    <>
+      <TagModForm {...editor} onSuccess={onSuccess} />
+
+      <Spin spinning={loading}>
+        <div style={{ borderBottom: '1px solid #e9e9e9' }}>
+          <Checkbox
+            checked={list.length === value.length}
+            indeterminate={value.length > 0 && value.length < list.length}
+            onChange={() => {
+              if (list.length === value.length) {
+                onChange([]);
+              } else {
+                onChange(list.map((l) => l.id));
+              }
+            }}
+          >
+            全选
+          </Checkbox>
+          <a
+            onClick={() => {
+              const inverse = list.reduce((acc: string[], cur: TagSchema) => {
+                if (!value.includes(cur.id)) {
+                  return [...acc, cur.id];
+                }
+                return acc;
+              }, []);
+              onChange(inverse);
+            }}
+          >
+            反选
+          </a>
+        </div>
+        <CusTag style={{ borderStyle: 'dashed', background: '#fff' }} onClick={addHandler}>
+          <PlusOutlined /> 新增标签
+        </CusTag>
+
+        {list?.map((tag: TagSchema) => (
+          <CusTag
+            onClick={() => {
+              const id = tag.id;
+              const temp = value.includes(id)
+                ? value.filter((v: string) => v !== id)
+                : value.concat(id);
+              onChange(temp);
+            }}
+            closable
+            onClose={removeHandler(tag.id)}
+            key={tag.id}
+            color={tag.color}
+            onTouchStart={() => {
+              holdStart(editHandler(tag), 500);
+            }}
+            onTouchEnd={holdEnd}
+            onMouseDown={() => {
+              holdStart(editHandler(tag), 500);
+            }}
+            onMouseUp={holdEnd}
+          >
+            {value.includes(tag.id) && <CheckCircleTwoTone twoToneColor={theme['primary-color']} />}{' '}
+            {tag.name}
+          </CusTag>
+        ))}
+      </Spin>
+    </>
+  );
 }

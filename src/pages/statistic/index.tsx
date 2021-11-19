@@ -1,19 +1,20 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from 'react';
 
-import styled from "styled-components";
+import styled from 'styled-components';
 
-import { Button, DatePicker, Empty, Form, Spin } from "antd";
+import { Button, DatePicker, Empty, Form, Spin } from 'antd';
 
-import { BottomFixPanel, FillScrollPart } from "@/layouts/";
-import TagMgt from "@/components/TagMgt";
+import { BottomFixPanel, FillScrollPart } from '@/layouts/';
+import TagMgt from '@/components/TagMgt';
 
-import type { StatisticSchema } from "@/models/record";
-import type { TagSchema } from "@/models/tag";
+import type { StatisticSchema } from '@/pages/record/models';
+import type { TagSchema } from '@/components/TagMgt/models';
 
-import { nsFormat } from "@/utils/goTime";
+import { nsFormat } from '@/utils/goTime';
 
-import moment from "moment";
+import moment from 'moment';
+import useTagList from '@/components/TagMgt/hooks/useTagList';
+import useStatisticList from './hooks/useStatisticList';
 
 interface rootState {
   record: {
@@ -40,79 +41,72 @@ const InputBar = styled.div`
 const CusFillScrollPart = styled(FillScrollPart)`
   background: #eee;
   .cus-spin,
-  .ant-spin-container
-   {
+  .ant-spin-container {
     height: 100%;
   }
 
-  .ant-spin{
+  .ant-spin {
     max-height: unset !important;
   }
 `;
 
 const CusEmpty = styled(Empty)`
   height: 100%;
-  display:flex;
+  display: flex;
   flex-direction: column;
   justify-content: center;
 `;
 
 const RecordItem = styled.div<StatisticItemProps>`
-margin: 8px 12px;
-padding: 10px 16px;
-background: rgba(255, 255, 255, 0.85);
-box-shadow: 1px 1px 20px 1px rgba(233, 233, 233, 0.85);
-cursor: pointer;
-position: relative;
-& *{
+  margin: 8px 12px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 1px 1px 20px 1px rgba(233, 233, 233, 0.85);
+  cursor: pointer;
   position: relative;
-  color: white;
-  mix-blend-mode: difference;
-};
+  & * {
+    position: relative;
+    color: white;
+    mix-blend-mode: difference;
+  }
 
-.content {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
+  .content {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
 
-.main {
-  font-size: 20px;
-  font-weight: bold;
-}
+  .main {
+    font-weight: bold;
+    font-size: 20px;
+  }
 
-.extra {
-  font-size: 16px;
-  font-weight: 100;
-}
+  .extra {
+    font-weight: 100;
+    font-size: 16px;
+  }
 
-:before {
-  content: ' ';
-  position: absolute;
-  width: ${(props) => props.ratio}%;
-  background: ${(props) => props.color};
-  height: 100%;
-  top: 0;
-  left: 0;
-} 
+  :before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: ${(props) => props.ratio}%;
+    height: 100%;
+    background: ${(props) => props.color};
+    content: ' ';
+  }
 `;
 
 export default () => {
   const [form] = Form.useForm();
-  const { statistic, loading, tags } = useSelector((s: rootState) => ({
-    statistic: s.record.statistic,
-    loading: s.loading.models.record,
-    tags: s.tag.list,
-  }));
-  const dispatch = useDispatch();
+  const { data: tags, isFetching: loading } = useTagList();
+  const [formValue, setFormValue] = useState();
+  const { data: statistic } = useStatisticList(formValue);
 
-  const total = statistic?.reduce((acc, cur) => acc += cur.deration, 0);
+  const total = statistic?.reduce((acc: number, cur: StatisticSchema) => (acc += cur.deration), 0);
+
   async function submit(values: any) {
-    try {
-      await dispatch({ type: "record/statistic", payload: values });
-    } catch (e) {
-      console.error("create err: ", e);
-    }
+    setFormValue(values);
   }
 
   function cancel() {
@@ -123,52 +117,46 @@ export default () => {
     <BottomFixPanel>
       <CusFillScrollPart>
         <Spin spinning={loading} wrapperClassName="cus-spin">
-          {statistic.length
-            ? statistic.map((record: StatisticSchema) => {
+          {statistic.length ? (
+            statistic.map((record: StatisticSchema) => {
               const tag = tags.find((t: TagSchema) => t.id === record.id);
-              const ratio = (record.deration / total * 100).toFixed(2);
-              return <RecordItem
-                key={record.id}
-                ratio={ratio}
-                color={tag?.color}
-              >
-                <h3>{tag?.name}</h3>
-                <div className="content">
-                  <div className="main">
-                    {ratio}%
+              const ratio = ((record.deration / total) * 100).toFixed(2);
+              return (
+                <RecordItem key={record.id} ratio={ratio} color={tag?.color}>
+                  <h3>{tag?.name}</h3>
+                  <div className="content">
+                    <div className="main">{ratio}%</div>
+                    <div className="extra">{nsFormat(record.deration)}</div>
                   </div>
-                  <div className="extra">
-                    {nsFormat(record.deration)}
-                  </div>
-                </div>
-              </RecordItem>;
+                </RecordItem>
+              );
             })
-            : <CusEmpty />}
+          ) : (
+            <CusEmpty />
+          )}
         </Spin>
       </CusFillScrollPart>
+
       <Form
         onFinish={submit}
         form={form}
         initialValues={{
-          dateRange: [moment().startOf("day"), moment().endOf("day")],
+          dateRange: [moment().startOf('day'), moment().endOf('day')],
         }}
       >
         <BottomFixPanel
           style={{
-            height: "25vh",
-            borderTop: "1px solid rgba(233,233,233, 05)",
-            boxShadow: "0px 0px 20px 0px rgba(0,0,0,0.1)",
+            height: '25vh',
+            borderTop: '1px solid rgba(233,233,233, 05)',
+            boxShadow: '0px 0px 20px 0px rgba(0,0,0,0.1)',
           }}
         >
           <FillScrollPart
             style={{
-              padding: "0 0 6px 6px",
+              padding: '0 0 6px 6px',
             }}
           >
-            <Form.Item
-              style={{ marginBottom: 0 }}
-              name="tids"
-            >
+            <Form.Item style={{ marginBottom: 0 }} name="tids">
               <TagMgt />
             </Form.Item>
           </FillScrollPart>
@@ -182,22 +170,22 @@ export default () => {
               name="dateRange"
             >
               <DatePicker.RangePicker
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 allowClear
-                showTime={{ format: "HH:mm" }}
+                showTime={{ format: 'HH:mm' }}
                 ranges={{
-                  "今天": [moment().startOf("day"), moment().endOf("day")],
-                  "昨天": [
-                    moment().add(-1, "day").startOf("day"),
-                    moment().add(-1, "day").endOf("day"),
+                  今天: [moment().startOf('day'), moment().endOf('day')],
+                  昨天: [
+                    moment().add(-1, 'day').startOf('day'),
+                    moment().add(-1, 'day').endOf('day'),
                   ],
-                  "本周": [moment().startOf("week"), moment().endOf("week")],
-                  "上周": [
-                    moment().add(-1, "week").startOf("week"),
-                    moment().add(-1, "week").endOf("week"),
+                  本周: [moment().startOf('week'), moment().endOf('week')],
+                  上周: [
+                    moment().add(-1, 'week').startOf('week'),
+                    moment().add(-1, 'week').endOf('week'),
                   ],
-                  "本月": [moment().startOf("month"), moment().endOf("month")],
-                  "今年": [moment().startOf("year"), moment().endOf("year")],
+                  本月: [moment().startOf('month'), moment().endOf('month')],
+                  今年: [moment().startOf('year'), moment().endOf('year')],
                 }}
               />
             </Form.Item>

@@ -1,34 +1,24 @@
-import React, { useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useInfiniteQuery, useQueryClient } from "react-query";
+import React, { useRef, useState } from 'react';
+import { useInfiniteQuery, useQueryClient, useQuery } from 'react-query';
 
-import styled from "styled-components";
+import styled from 'styled-components';
 
-import { Button, Empty, Form, Input, message, Spin } from "antd";
+import { Button, Empty, Form, Input, Spin } from 'antd';
 
-import { BottomFixPanel, FillScrollPart } from "@/layouts/";
-import TagMgt, { CusTag } from "@/components/TagMgt";
+import { BottomFixPanel, FillScrollPart } from '@/layouts/';
+import TagMgt, { CusTag } from '@/components/TagMgt';
 
-import type { RecordSchema } from "@/models/record";
-import type { TagSchema } from "@/models/tag";
+import type { RecordSchema } from '@/pages/record/models';
+import type { TagSchema } from '@/components/TagMgt/models';
 
-import OnReachBottom from "@/js-sdk/native/onReachBottom";
+import { nsFormat } from '@/utils/goTime';
 
-import { nsFormat } from "@/utils/goTime";
+import theme from '@/theme';
+import moment from 'moment';
 
-import theme from "@/theme";
-import moment from "moment";
-
-import { RESTful } from "@/http/";
-
-interface rootState {
-  tag: {
-    list: TagSchema[];
-  };
-  loading: {
-    models: { record: boolean };
-  };
-}
+import { restful as RESTful } from '@/js-sdk/utils/http';
+import useTagList from '@/components/TagMgt/hooks/useTagList';
+import { add, update } from './services';
 
 const InputBar = styled.div`
   display: flex;
@@ -39,21 +29,20 @@ const CusFillScrollPart = styled(FillScrollPart)`
   background: #eee;
   position: relative;
   .cus-spin,
-  .ant-spin-container
-   {
+  .ant-spin-container {
     height: 100%;
   }
 
-  .ant-spin{
+  .ant-spin {
     position: absolute;
-    width: 100%;
     top: 50%;
+    width: 100%;
   }
 `;
 
 const CusEmpty = styled(Empty)`
   height: 100%;
-  display:flex;
+  display: flex;
   flex-direction: column;
   justify-content: center;
 `;
@@ -61,14 +50,14 @@ const CusEmpty = styled(Empty)`
 const RecordItem = styled.div`
   margin: 8px 12px;
   padding: 10px 16px;
-  background: rgba(255,255,255, 0.85);
-  box-shadow: 1px 1px 20px 1px rgba(233,233,233,0.85);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 1px 1px 20px 1px rgba(233, 233, 233, 0.85);
   cursor: pointer;
 
   &.active,
   :hover {
-    border-bottom: 3px solid ${theme["primary-color"]};
-  };
+    border-bottom: 3px solid ${theme['primary-color']};
+  }
 
   :active {
     background: #fff;
@@ -77,71 +66,62 @@ const RecordItem = styled.div`
 
   .content {
     display: flex;
-    justify-content: space-between;
     align-items: flex-end;
+    justify-content: space-between;
   }
 
   .main {
-    font-size: 20px;
     font-weight: bold;
+    font-size: 20px;
   }
 
   .extra {
-    font-size: 16px;
     font-weight: 100;
+    font-size: 16px;
   }
 `;
 
 export default () => {
   const [form] = Form.useForm();
-  const { loading, tags } = useSelector((s: rootState) => ({
-    loading: s.loading.models.record,
-    tags: s.tag.list,
-  }));
-  const dispatch = useDispatch();
+  const { data: tags, isFetching: loading } = useTagList();
 
-  const [curId, setCurId] = useState("");
+  const [curId, setCurId] = useState('');
 
   const last = useRef(0);
   const timer = useRef(0);
   const queryClient = useQueryClient();
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-  } = useInfiniteQuery("records", ({ pageParam = 0 }) => {
-    return RESTful.get("time-mgt/v1/record/list", {
-      silence: "success",
-      params: {
-        skip: pageParam * 10,
-        limit: 10,
-      },
-    });
-  }, {
-    getNextPageParam: (lastPage, pages) => {
-      return lastPage?.data?.length === 10 ? pages?.length : undefined;
+  const { data, fetchNextPage, hasNextPage, isFetching } = useInfiniteQuery(
+    'records',
+    ({ pageParam = 0 }) => {
+      return RESTful.get('time-mgt/v1/record/list', {
+        notify: 'fail',
+        params: {
+          skip: pageParam * 10,
+          limit: 10,
+        },
+      });
     },
-  });
+    {
+      getNextPageParam: (lastPage, pages) => {
+        return lastPage?.data?.length === 10 ? pages?.length : undefined;
+      },
+    },
+  );
 
   async function submit(values: any) {
     try {
       if (curId) {
-        await dispatch(
-          { type: "record/update", payload: { ...values, id: curId } },
-        );
-        setCurId("");
+        await add(values);
+        setCurId('');
       } else {
-        await dispatch(
-          { type: "record/add", payload: values },
-        );
+        await update({ ...values, id: curId });
       }
 
-      queryClient.invalidateQueries("records");
+      queryClient.invalidateQueries('records');
       form.resetFields();
     } catch (e) {
-      console.error("create err: ", e);
+      console.error('create err: ', e);
     }
   }
 
@@ -152,98 +132,66 @@ export default () => {
 
   function cancel() {
     form.resetFields();
-    setCurId("");
+    setCurId('');
   }
 
   return (
     <BottomFixPanel>
-      <CusFillScrollPart
-        onScroll={(e: React.UIEvent<HTMLElement, UIEvent>) => {
-          // Note:
-          // If you want to access the event properties in an asynchronous way,
-          // you should call event.persist() on the event.
-          e.persist();
-          // 触底
-          const fn = OnReachBottom(
-            () => {
-              if (hasNextPage) {
-                fetchNextPage();
-              } else {
-                message.warn({ content: "没有更多了" });
-              }
-            },
-            30,
-          );
-          const now = Date.now();
-          // 节流
-          if (last.current && now < last.current + 300) {
-            clearTimeout(timer.current);
-            timer.current = setTimeout(() => {
-              last.current = now;
-              fn(e);
-            });
-          } else {
-            last.current = now;
-            fn(e);
-          }
-        }}
-      >
-        {data?.pages?.length
-          ? data?.pages?.map((gorup) =>
-            gorup?.data?.map((record: RecordSchema) => {
-              return <RecordItem
+      {data?.pages?.length ? (
+        data?.pages?.map((group) =>
+          group?.data?.map((record: RecordSchema) => {
+            return (
+              <RecordItem
                 key={record.id}
                 onClick={() => checked(record)}
-                className={`${record.id === curId ? "active" : ""}`}
+                className={`${record.id === curId ? 'active' : ''}`}
               >
-                <h3 style={{ color: "#333" }}>
-                  {moment(record.createAt).format("YYYY-MM-DD HH:mm:ss")}
+                <h3 style={{ color: '#333' }}>
+                  {moment(record.createAt).format('YYYY-MM-DD HH:mm:ss')}
                 </h3>
                 <div className="content">
-                  <div className="main">
-                    {record.event}
-                  </div>
-                  <div className="extra">
-                    {nsFormat(record.deration)}
-                  </div>
+                  <div className="main">{record.event}</div>
+                  <div className="extra">{nsFormat(record.deration)}</div>
                 </div>
                 <div>
                   {record?.tid?.map((oid: string) => {
                     const findTag = tags.find((t: TagSchema) => t.id === oid);
 
-                    return <CusTag
-                      key={oid}
-                      color={findTag?.color}
-                    >
-                      {findTag?.name}
-                    </CusTag>;
+                    return (
+                      <CusTag key={oid} color={findTag?.color}>
+                        {findTag?.name}
+                      </CusTag>
+                    );
                   })}
                 </div>
-              </RecordItem>;
-            })
-          )
-          : <CusEmpty />}
-        <Spin spinning={isFetching} wrapperClassName="cus-spin"></Spin>
-      </CusFillScrollPart>
+              </RecordItem>
+            );
+          }),
+        )
+      ) : (
+        <CusEmpty />
+      )}
+      <Spin spinning={isFetching} wrapperClassName="cus-spin"></Spin>
+
       <Form onFinish={submit} form={form}>
         <BottomFixPanel
           style={{
-            height: "25vh",
-            borderTop: "1px solid rgba(233,233,233, 05)",
-            boxShadow: "0px 0px 20px 0px rgba(0,0,0,0.1)",
+            height: '25vh',
+            borderTop: '1px solid rgba(233,233,233, 05)',
+            boxShadow: '0px 0px 20px 0px rgba(0,0,0,0.1)',
           }}
         >
           <FillScrollPart
             style={{
-              padding: "0 0 6px 6px",
+              padding: '0 0 6px 6px',
             }}
           >
             <Form.Item
               style={{ marginBottom: 0 }}
               name="tid"
               rules={[
-                { required: true, message: "请选一个标签" },
-                { type: "array", min: 0, message: "请选一个标签" },
+                { required: true, message: '请选一个标签' },
+                { type: 'array', min: 0, message: '请选一个标签' },
               ]}
             >
               <TagMgt />
@@ -258,12 +206,11 @@ export default () => {
               }}
               name="event"
             >
-              <Input placeholder="请记录做了什么" allowClear autoComplete="off">
-              </Input>
+              <Input placeholder="请记录做了什么" allowClear autoComplete="off"></Input>
             </Form.Item>
             <Button onClick={cancel}>取消</Button>
             <Button type="primary" htmlType="submit" loading={loading}>
-              {curId ? "修改" : "记录"}
+              {curId ? '修改' : '记录'}
             </Button>
           </InputBar>
         </BottomFixPanel>
