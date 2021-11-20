@@ -6,7 +6,7 @@ export const add = <T, R, D>(...payload: [data?: D, opt?: CustomRequestConfig<D>
 }
 
 export const remove = <T, R, D>(payload: string, cfg?: CustomRequestConfig<D>) => {
-    return restful.delete<T, R, D>(`time-mgt/tag/${payload}`, cfg);
+    return restful.delete<T, R, D>(`time-mgt/v1/tag/${payload}`, cfg);
 }
 
 export const update = <T, R, D>(...payload: [data?: D, opt?: CustomRequestConfig<D>]) => {
