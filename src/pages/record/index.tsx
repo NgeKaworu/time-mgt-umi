@@ -21,6 +21,7 @@ import useTagList from '@/components/TagMgt/hooks/useTagList';
 import { add, update, page } from './services';
 
 import { WindowScroller, List, InfiniteLoader, ListProps } from 'react-virtualized';
+import isValidValue from '@/js-sdk/utils/isValidValue';
 
 const InputBar = styled.div`
   display: flex;
@@ -85,9 +86,11 @@ const RecordItem = styled.div`
 
 export default () => {
   const [form] = Form.useForm();
-  const { data: tags, isFetching: loading } = useTagList();
+  const { data: tagsList, isFetching: loading } = useTagList(),
+    tags = tagsList?.data;
 
-  const [curId, setCurId] = useState('');
+  const [curId, setCurId] = useState(''),
+    isEdit = isValidValue(curId);
 
   const last = useRef(0);
   const timer = useRef(0);
@@ -120,11 +123,11 @@ export default () => {
 
   async function submit(values: any) {
     try {
-      if (curId) {
-        await add(values);
+      if (isEdit) {
+        await update({ ...values, id: curId });
         setCurId('');
       } else {
-        await update({ ...values, id: curId });
+        await add(values);
       }
 
       queryClient.invalidateQueries('records');
@@ -178,7 +181,7 @@ export default () => {
             </div>
             <div>
               {record?.tid?.map((oid: string) => {
-                const findTag = tags.find((t: TagSchema) => t.id === oid);
+                const findTag = tags?.find((t: TagSchema) => t.id === oid);
 
                 return (
                   <CusTag key={oid} color={findTag?.color}>
@@ -208,14 +211,14 @@ export default () => {
                   autoHeight
                   style={{
                     background: '#f0f2f5',
-                    paddingTop: '58px',
                     paddingBottom: '128px',
+                    height: '100%',
                   }}
                   {...winProps}
                   ref={(ref) => registerChild(winRef(ref))}
                   rowCount={total}
                   onRowsRendered={onRowsRendered}
-                  rowHeight={200}
+                  rowHeight={130}
                   rowRenderer={renderItem}
                 />
               )}
@@ -225,7 +228,6 @@ export default () => {
       ) : (
         <CusEmpty />
       )}
-      <Spin spinning={isFetching} wrapperClassName="cus-spin"></Spin>
 
       <Form onFinish={submit} form={form}>
         <BottomFixPanel

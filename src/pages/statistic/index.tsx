@@ -99,9 +99,11 @@ const RecordItem = styled.div<StatisticItemProps>`
 
 export default () => {
   const [form] = Form.useForm();
-  const { data: tags, isFetching: loading } = useTagList();
   const [formValue, setFormValue] = useState();
-  const { data: statistic } = useStatisticList(formValue);
+  const { data: tagsList, isFetching: loading } = useTagList(),
+    tags = tagsList?.data ?? [],
+    { data: statisticList } = useStatisticList(formValue),
+    statistic = statisticList?.data ?? [];
 
   const total = statistic?.reduce((acc: number, cur: StatisticSchema) => (acc += cur.deration), 0);
 

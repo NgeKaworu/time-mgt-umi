@@ -18,10 +18,11 @@ export default defineConfig({
     },
   ],
   devServer: {
-    port: 8020,
+    port: 8030,
     proxy: {
       '/api/time-mgt': {
-        target: 'https://api.furan.xyz/time-mgt',
+        // target: 'https://api.furan.xyz/time-mgt',
+        target: 'http://localhost:8031',
         changeOrigin: true,
         pathRewrite: {
           '/api/time-mgt': '',
