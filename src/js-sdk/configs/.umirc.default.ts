@@ -21,6 +21,7 @@ export default defineConfig({
   request: false,
   sass: false,
   hash: true,
+  runtimePublicPath: true,
   externals: {
     moment: 'moment',
   },
