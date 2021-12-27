@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 
 import styled from 'styled-components';
 
-import { Button, DatePicker, Empty, Form, Spin } from 'antd';
+import { Button, DatePicker, Empty, Form, Spin, Input } from 'antd';
 
-import { BottomFixPanel, FillScrollPart } from '@/layouts/';
 import TagMgt from '@/components/TagMgt';
 
 import type { StatisticSchema } from '@/pages/record/models';
@@ -16,86 +15,9 @@ import moment from 'moment';
 import useTagList from '@/components/TagMgt/hooks/useTagList';
 import useStatisticList from './hooks/useStatisticList';
 
-interface rootState {
-  record: {
-    statistic: StatisticSchema[];
-  };
-  tag: {
-    list: TagSchema[];
-  };
-  loading: {
-    models: { record: boolean };
-  };
-}
-
-interface StatisticItemProps {
-  color?: string;
-  ratio: string;
-}
-
-const InputBar = styled.div`
-  display: flex;
-  width: 100%;
-`;
-
-const CusFillScrollPart = styled(FillScrollPart)`
-  background: #eee;
-  .cus-spin,
-  .ant-spin-container {
-    height: 100%;
-  }
-
-  .ant-spin {
-    max-height: unset !important;
-  }
-`;
-
-const CusEmpty = styled(Empty)`
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-`;
-
-const RecordItem = styled.div<StatisticItemProps>`
-  margin: 8px 12px;
-  padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 1px 1px 20px 1px rgba(233, 233, 233, 0.85);
-  cursor: pointer;
-  position: relative;
-  & * {
-    position: relative;
-    color: white;
-    mix-blend-mode: difference;
-  }
-
-  .content {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-  }
-
-  .main {
-    font-weight: bold;
-    font-size: 20px;
-  }
-
-  .extra {
-    font-weight: 100;
-    font-size: 16px;
-  }
-
-  :before {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: ${(props) => props.ratio}%;
-    height: 100%;
-    background: ${(props) => props.color};
-    content: ' ';
-  }
-`;
+import layoutStyles from '@/layouts/index.less';
+import baseStyles from '@/index.less';
+import styles from './index.less';
 
 export default () => {
   const [form] = Form.useForm();
@@ -116,28 +38,41 @@ export default () => {
   }
 
   return (
-    <BottomFixPanel>
-      <CusFillScrollPart>
+    <div className={layoutStyles['bottom-fix-panel']}>
+      <section className={[styles['fill-scroll-part'], layoutStyles['fill-scroll-part']].join(' ')}>
         <Spin spinning={loading} wrapperClassName="cus-spin">
           {statistic.length ? (
             statistic.map((record: StatisticSchema) => {
-              const tag = tags.find((t: TagSchema) => t.id === record.id);
-              const ratio = ((record.deration / total) * 100).toFixed(2);
+              const tag = tags.find((t: TagSchema) => t.id === record.id),
+                ratio = ((record.deration / total) * 100).toFixed(2),
+                color = tag?.color ?? '';
+
               return (
-                <RecordItem key={record.id} ratio={ratio} color={tag?.color}>
-                  <h3>{tag?.name}</h3>
-                  <div className="content">
-                    <div className="main">{ratio}%</div>
-                    <div className="extra">{nsFormat(record.deration)}</div>
+                <div
+                  className={baseStyles['record-item']}
+                  key={record.id}
+                  style={{
+                    background: `linear-gradient(to right, ${color} 0% ${ratio}%, #fff ${ratio}% 100%)`,
+                  }}
+                >
+                  <h3 style={{ color }} className={styles.filter}>
+                    {tag?.name}
+                  </h3>
+                  <div
+                    style={{ color }}
+                    className={[baseStyles['content'], styles.filter].join(' ')}
+                  >
+                    <div className={baseStyles['main']}>{ratio}%</div>
+                    <div className={baseStyles['extra']}>{nsFormat(record.deration)}</div>
                   </div>
-                </RecordItem>
+                </div>
               );
             })
           ) : (
-            <CusEmpty />
+            <Empty className={baseStyles.empty} />
           )}
         </Spin>
-      </CusFillScrollPart>
+      </section>
 
       <Form
         onFinish={submit}
@@ -146,14 +81,16 @@ export default () => {
           dateRange: [moment().startOf('day'), moment().endOf('day')],
         }}
       >
-        <BottomFixPanel
+        <div
+          className={layoutStyles['bottom-fix-panel']}
           style={{
             height: '25vh',
             borderTop: '1px solid rgba(233,233,233, 05)',
             boxShadow: '0px 0px 20px 0px rgba(0,0,0,0.1)',
           }}
         >
-          <FillScrollPart
+          <section
+            className={layoutStyles['fill-scroll-part']}
             style={{
               padding: '0 0 6px 6px',
             }}
@@ -161,9 +98,9 @@ export default () => {
             <Form.Item style={{ marginBottom: 0 }} name="tids">
               <TagMgt />
             </Form.Item>
-          </FillScrollPart>
+          </section>
 
-          <InputBar>
+          <Input.Group compact style={{ display: 'flex' }}>
             <Form.Item
               style={{
                 marginBottom: 0,
@@ -195,9 +132,9 @@ export default () => {
             <Button type="primary" htmlType="submit" loading={loading}>
               查询
             </Button>
-          </InputBar>
-        </BottomFixPanel>
+          </Input.Group>
+        </div>
       </Form>
-    </BottomFixPanel>
+    </div>
   );
 };

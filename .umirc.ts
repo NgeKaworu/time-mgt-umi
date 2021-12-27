@@ -1,10 +1,11 @@
 import { defineConfig } from 'umi';
-import base from './.umirc.default';
+import base from './src/js-sdk/configs/.umirc.default';
 import routes from './routes';
+import theme from './src/theme';
 
 export default defineConfig({
   ...base,
-  dva: {},
+  theme,
   title: '柳比歇夫时间管理法',
   routes,
   devServer: {
@@ -20,7 +21,7 @@ export default defineConfig({
     },
   },
 
-  base: '/micro/time-mgt',
+  base: '/time-mgt',
   publicPath: '/micro/time-mgt/',
   extraBabelPlugins: [
     [

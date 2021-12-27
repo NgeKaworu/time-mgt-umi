@@ -1,88 +1,25 @@
 import React, { useRef, useState } from 'react';
-import { useInfiniteQuery, useQueryClient, useQuery } from 'react-query';
+import { useInfiniteQuery, useQueryClient } from 'react-query';
 
-import styled from 'styled-components';
+import { Button, Card, Empty, Form, Input, Skeleton, Tag } from 'antd';
 
-import { Button, Card, Empty, Form, Input, Skeleton, Spin } from 'antd';
-
-import { BottomFixPanel, FillScrollPart } from '@/layouts/';
-import TagMgt, { CusTag } from '@/components/TagMgt';
+import TagMgt from '@/components/TagMgt';
 
 import type { RecordSchema } from '@/pages/record/models';
 import type { TagSchema } from '@/components/TagMgt/models';
 
 import { nsFormat } from '@/utils/goTime';
 
-import theme from '@/theme';
 import moment from 'moment';
 
-import { restful as RESTful } from '@/js-sdk/utils/http';
 import useTagList from '@/components/TagMgt/hooks/useTagList';
 import { add, update, page } from './services';
 
 import { WindowScroller, List, InfiniteLoader, ListProps } from 'react-virtualized';
 import isValidValue from '@/js-sdk/utils/isValidValue';
 
-const InputBar = styled.div`
-  display: flex;
-  width: 100%;
-`;
-
-const CusFillScrollPart = styled(FillScrollPart)`
-  background: #eee;
-  position: relative;
-  .cus-spin,
-  .ant-spin-container {
-    height: 100%;
-  }
-
-  .ant-spin {
-    position: absolute;
-    top: 50%;
-    width: 100%;
-  }
-`;
-
-const CusEmpty = styled(Empty)`
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-`;
-
-const RecordItem = styled.div`
-  margin: 8px 12px;
-  padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 1px 1px 20px 1px rgba(233, 233, 233, 0.85);
-  cursor: pointer;
-
-  &.active,
-  :hover {
-    border-bottom: 3px solid ${theme['primary-color']};
-  }
-
-  :active {
-    background: #fff;
-    opacity: 0.85;
-  }
-
-  .content {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-  }
-
-  .main {
-    font-weight: bold;
-    font-size: 20px;
-  }
-
-  .extra {
-    font-weight: 100;
-    font-size: 16px;
-  }
-`;
+import layoutStyles from '@/layouts/index.less';
+import styles from '@/index.less';
 
 export default () => {
   const [form] = Form.useForm();
@@ -92,8 +29,6 @@ export default () => {
   const [curId, setCurId] = useState(''),
     isEdit = isValidValue(curId);
 
-  const last = useRef(0);
-  const timer = useRef(0);
   const queryClient = useQueryClient();
 
   const { data, fetchNextPage, hasNextPage, isFetching } = useInfiniteQuery(
@@ -165,32 +100,32 @@ export default () => {
     const record: RecordSchema = pages?.[index];
 
     return (
-      <div style={{ ...style, padding: '6px 0' }} key={record?.id}>
+      <div style={style} key={record?.id}>
         {isItemLoaded({ index }) ? (
-          <RecordItem
+          <div
             key={record.id}
             onClick={() => checked(record)}
-            className={`${record.id === curId ? 'active' : ''}`}
+            className={[styles['record-item'], record.id === curId && styles['active']].join(' ')}
           >
             <h3 style={{ color: '#333' }}>
               {moment(record.createAt).format('YYYY-MM-DD HH:mm:ss')}
             </h3>
-            <div className="content">
-              <div className="main">{record.event}</div>
-              <div className="extra">{nsFormat(record.deration)}</div>
+            <div className={styles['content']}>
+              <div className={styles['main']}>{record.event}</div>
+              <div className={styles['extra']}>{nsFormat(record.deration)}</div>
             </div>
             <div>
               {record?.tid?.map((oid: string) => {
                 const findTag = tags?.find((t: TagSchema) => t.id === oid);
 
                 return (
-                  <CusTag key={oid} color={findTag?.color}>
+                  <Tag key={oid} color={findTag?.color}>
                     {findTag?.name}
-                  </CusTag>
+                  </Tag>
                 );
               })}
             </div>
-          </RecordItem>
+          </div>
         ) : (
           <Card style={{ margin: '12px' }}>
             <Skeleton />
@@ -201,14 +136,13 @@ export default () => {
   };
 
   return (
-    <BottomFixPanel>
+    <div className={layoutStyles['bottom-fix-panel']}>
       {pages?.length ? (
         <InfiniteLoader isRowLoaded={isItemLoaded} rowCount={total} loadMoreRows={loadMoreItems}>
           {({ onRowsRendered, registerChild }) => (
             <WindowScroller>
               {({ registerChild: winRef, ...winProps }) => (
                 <List
-                  autoHeight
                   style={{
                     background: '#f0f2f5',
                     paddingBottom: '128px',
@@ -218,26 +152,28 @@ export default () => {
                   ref={(ref) => registerChild(winRef(ref))}
                   rowCount={total}
                   onRowsRendered={onRowsRendered}
-                  rowHeight={130}
                   rowRenderer={renderItem}
+                  rowHeight={118}
                 />
               )}
             </WindowScroller>
           )}
         </InfiniteLoader>
       ) : (
-        <CusEmpty />
+        <Empty className={styles.empty} />
       )}
 
       <Form onFinish={submit} form={form}>
-        <BottomFixPanel
+        <div
+          className={layoutStyles['bottom-fix-panel']}
           style={{
             height: '25vh',
             borderTop: '1px solid rgba(233,233,233, 05)',
             boxShadow: '0px 0px 20px 0px rgba(0,0,0,0.1)',
           }}
         >
-          <FillScrollPart
+          <section
+            className={layoutStyles['fill-scroll-part']}
             style={{
               padding: '0 0 6px 6px',
             }}
@@ -252,9 +188,9 @@ export default () => {
             >
               <TagMgt />
             </Form.Item>
-          </FillScrollPart>
+          </section>
 
-          <InputBar>
+          <Input.Group compact style={{ display: 'flex' }}>
             <Form.Item
               style={{
                 marginBottom: 0,
@@ -268,9 +204,9 @@ export default () => {
             <Button type="primary" htmlType="submit" loading={loading}>
               {curId ? '修改' : '记录'}
             </Button>
-          </InputBar>
-        </BottomFixPanel>
+          </Input.Group>
+        </div>
       </Form>
-    </BottomFixPanel>
+    </div>
   );
 };

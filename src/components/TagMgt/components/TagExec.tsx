@@ -40,7 +40,13 @@ export function TagModForm({
   return (
     <ModalForm
       modalProps={{ onOk: onSubmit, ...modalProps }}
-      formProps={{ onFinish: onSubmit, ...formProps }}
+      formProps={{
+        onFinish: onSubmit,
+        initialValues: {
+          color: '#f5222d',
+        },
+        ...formProps,
+      }}
     >
       <Item name="id" hidden>
         <Input />
