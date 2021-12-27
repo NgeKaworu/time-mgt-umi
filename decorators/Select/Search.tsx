@@ -1,3 +1,4 @@
+import { ignoreCaseIncludes } from '@/js-sdk/struct/string/util';
 import type React from 'react';
 import { cloneElement } from 'react';
 /**
@@ -6,9 +7,9 @@ import { cloneElement } from 'react';
 export default (Select: React.ReactElement) => {
   return cloneElement(Select, {
     showSearch: true,
-    optionFilterProp: 'label',
-    filterOption: (input: string, option: any) =>
-      option?.value?.toString()?.toLowerCase()?.includes(input?.toString()?.toLowerCase()) ||
-      option?.label?.toString()?.toLowerCase()?.includes(input?.toString()?.toLowerCase()),
+    filterOption: filter,
   });
 };
+
+export const filter = <Opt extends { label?: any; value?: any }>(input: string, option: Opt) =>
+  ignoreCaseIncludes(option?.value, input) || ignoreCaseIncludes(option?.label, input);

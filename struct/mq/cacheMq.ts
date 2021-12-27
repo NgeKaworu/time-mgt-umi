@@ -1,4 +1,4 @@
-import { MessageQueue, Subscriber } from './';
+import { MessageQueue, Subscriber } from '.';
 
 export default class CacheMessageQueue<Subject extends any[]> implements MessageQueue<Subject> {
   subscribers: Subscriber<Subject>[] = [];

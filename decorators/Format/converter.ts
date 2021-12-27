@@ -2,7 +2,6 @@
 export const arr2str = (arr: string[]) => arr?.join?.();
 export const str2arr = (str: string) => (str ? str?.split?.(',') : []);
 
-import getFileNameInPath from '../../utils/file/getFileNameInPath';
 /** file */
 import type { FormItemProps } from 'antd';
 export type File = { url?: string; response?: string; [key: string]: any };
@@ -22,7 +21,7 @@ export const normalize: FormItemProps['normalize'] = (v) => {
 // signal file
 export const str2fileList = (value?: string): FileList =>
   typeof value === 'string'
-    ? [{ uid: value, response: value, url: value, thumbUrl: value, name: getFileNameInPath(value) }]
+    ? [{ uid: value, response: value, url: value, thumbUrl: value, name: value }]
     : value;
 
 export const uploadEvent2str: FormItemProps['normalize'] = (value) => value?.[0]?.response ?? value;
@@ -40,3 +39,8 @@ export const uploadEvent2strArr: FormItemProps['normalize'] = (value) =>
 import moment from 'moment';
 export const moment2str = (v: any) => v?.format('YYYY-MM-DD HH:mm:ss') ?? v;
 export const str2moment = (v: any) => (v ? moment(v) : undefined);
+
+export const encodeB64URI = (v: string) =>
+  typeof v === 'string' ? window.btoa(encodeURIComponent(v)) : v;
+export const decodeB64URI = (v: string) =>
+  typeof v === 'string' ? decodeURIComponent(window.atob(v)) : v;

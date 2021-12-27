@@ -1,4 +1,4 @@
-import setTo from './';
+import setTo from '.';
 
 describe('setTo test', () => {
   it("setTo(undefined, ['a', 1, '3'], '123') => { a: [, [, , , '123']] }", () => {
