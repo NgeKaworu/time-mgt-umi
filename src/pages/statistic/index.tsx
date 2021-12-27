@@ -38,7 +38,7 @@ export default () => {
   return (
     <div className={layoutStyles['bottom-fix-panel']}>
       <section className={[styles['fill-scroll-part'], layoutStyles['fill-scroll-part']].join(' ')}>
-        <Spin spinning={loading} wrapperClassName="cus-spin">
+        <Spin spinning={loading} wrapperClassName={styles['cus-spin']}>
           {statistic.length ? (
             statistic.map((record: StatisticSchema) => {
               const tag = tags.find((t: TagSchema) => t.id === record.id),
