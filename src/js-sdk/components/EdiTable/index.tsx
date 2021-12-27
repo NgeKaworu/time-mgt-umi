@@ -1,15 +1,16 @@
-import type { ReactNode } from "react";
-import { useRef } from "react";
-import type { TableProps } from "antd";
-import { Table, Form } from "antd";
-import type { FormListProps } from "antd/lib/form/FormList";
-import type { ColumnType } from "antd/lib/table";
-import { useDrag, useDrop } from "react-dnd";
+import type { ReactNode } from 'react';
+import { useRef } from 'react';
+import type { TableProps } from 'antd';
+import { Table, Form } from 'antd';
+import type { FormListProps } from 'antd/lib/form/FormList';
+import type { ColumnType } from 'antd/lib/table';
+import { useDrag, useDrop } from 'react-dnd';
 
-import styles from "./index.less";
-import { shouldUpdateManyHOF } from "../../decorators/shouldUpdateHOF";
+import styles from './index.less';
+import { shouldUpdateManyHOF } from '../../decorators/shouldUpdateHOF';
+import React from 'react';
 
-type FormListChildrenParams = Parameters<FormListProps["children"]>;
+type FormListChildrenParams = Parameters<FormListProps['children']>;
 interface FormListChildrenParamsInterface {
   fields: FormListChildrenParams[0];
   operation: FormListChildrenParams[1];
@@ -26,14 +27,14 @@ export interface EdiTableColumnType<P> extends ColumnType<P> {
   canDrag?: boolean;
 }
 export interface EdiTableProps<RecordType> {
-  formListProps: Omit<FormListProps, "children">;
-  tableProps: Omit<TableProps<RecordType>, "columns"> & {
+  formListProps: Omit<FormListProps, 'children'>;
+  tableProps: Omit<TableProps<RecordType>, 'columns'> & {
     columns: EdiTableColumnType<RecordType>[];
   };
   children?: (
     params: {
       body: ReactNode;
-    } & FormListChildrenParamsInterface
+    } & FormListChildrenParamsInterface,
   ) => ReactNode;
 }
 
@@ -54,27 +55,22 @@ export default <RecordType extends Record<string, any> = any>({
         {(fields, originOperation, meta) => {
           const operation = {
             ...originOperation,
-            add: (...rows: Parameters<FormListChildrenParams[1]["add"]>) =>
-              originOperation?.add(
-                { key: fields?.length, ...rows[0] },
-                rows[1]
-              ),
+            add: (...rows: Parameters<FormListChildrenParams[1]['add']>) =>
+              originOperation?.add({ key: fields?.length, ...rows[0] }, rows[1]),
           };
 
-          const injectColumns: any = columns?.map?.(
-            ({ renderFormItem, canDrag, ...column }) => ({
-              ...column,
-              onCell: (_: any, idx: any) => ({
-                name,
-                canDrag,
-                renderFormItem,
-                field: fields[idx],
-                fields,
-                operation,
-                meta,
-              }),
-            })
-          );
+          const injectColumns: any = columns?.map?.(({ renderFormItem, canDrag, ...column }) => ({
+            ...column,
+            onCell: (_: any, idx: any) => ({
+              name,
+              canDrag,
+              renderFormItem,
+              field: fields[idx],
+              fields,
+              operation,
+              meta,
+            }),
+          }));
 
           const body = (
             <>
@@ -132,7 +128,7 @@ export function DnDRow({
 
   const [{ isOver, dropClassName }, drop] = useDrop<any, any, any>(
     {
-      accept: name ?? "default",
+      accept: name ?? 'default',
       collect: (monitor) => {
         const { index: dragIndex } = monitor.getItem<any>() || {};
         if (dragIndex === field?.name) {
@@ -140,22 +136,21 @@ export function DnDRow({
         }
         return {
           isOver: monitor.isOver(),
-          dropClassName:
-            dragIndex < field?.name ? "drop-over-downward" : "drop-over-upward",
+          dropClassName: dragIndex < field?.name ? 'drop-over-downward' : 'drop-over-upward',
         };
       },
       drop: (item) => {
         operation.move(item.index, field?.name);
       },
     },
-    [name, field?.name]
+    [name, field?.name],
   );
 
   drop(rowRef);
   return (
     <tr
       ref={rowRef}
-      className={`${className} ${isOver ? styles?.[dropClassName] : ""}`}
+      className={`${className} ${isOver ? styles?.[dropClassName] : ''}`}
       children={children?.map?.((child: any) => ({
         ...child,
         props: {
@@ -185,23 +180,19 @@ export function DnDCell({
 } & RenderFormItemParams) {
   const [, drag, dragPreview] = useDrag(
     {
-      type: name ?? "default",
+      type: name ?? 'default',
       item: { index: field?.name },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
     },
-    [name, field?.name]
+    [name, field?.name],
   );
 
   dragPreview(rowRef);
 
   return (
-    <td
-      ref={canDrag && drag}
-      {...props}
-      style={{ cursor: canDrag ? "grab" : undefined, ...style }}
-    >
+    <td ref={canDrag && drag} {...props} style={{ cursor: canDrag ? 'grab' : undefined, ...style }}>
       {renderFormItem?.({ field, fields, operation, meta }) ?? props?.children}
     </td>
   );

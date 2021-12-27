@@ -1,4 +1,4 @@
-import getIn from '../utils/getIn';
+import getIn from '../struct/tree/getIn';
 import type { FormItemProps } from 'antd';
 
 export default (name: FormItemProps['name']): FormItemProps['shouldUpdate'] => {

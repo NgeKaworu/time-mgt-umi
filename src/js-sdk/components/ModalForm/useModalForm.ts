@@ -22,6 +22,7 @@ export default (initValue?: InitValue) => {
   const [formProps, setFormProps] = useState<FormProps>({
     form,
     layout: 'vertical',
+    scrollToFirstError: true,
     ...initValue?.formProps,
     validateMessages: { required: '${label} 是必选字段' },
   });
