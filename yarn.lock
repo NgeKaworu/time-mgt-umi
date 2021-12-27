@@ -123,7 +123,7 @@
     jsesc "^2.5.1"
     source-map "^0.5.0"
 
-"@babel/helper-annotate-as-pure@^7.15.4", "@babel/helper-annotate-as-pure@^7.16.0":
+"@babel/helper-annotate-as-pure@^7.16.0":
   version "7.16.0"
   resolved "https://registry.npmmirror.com/@babel/helper-annotate-as-pure/download/@babel/helper-annotate-as-pure-7.16.0.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2F%40babel%2Fhelper-annotate-as-pure%2Fdownload%2F%40babel%2Fhelper-annotate-as-pure-7.16.0.tgz"
   integrity sha1-mh8OvNpT2aLQAQjEzqzmpdXx8I0=
@@ -219,7 +219,7 @@
   dependencies:
     "@babel/types" "^7.16.0"
 
-"@babel/helper-module-imports@^7.0.0", "@babel/helper-module-imports@^7.12.13", "@babel/helper-module-imports@^7.15.4", "@babel/helper-module-imports@^7.16.0":
+"@babel/helper-module-imports@^7.12.13", "@babel/helper-module-imports@^7.16.0":
   version "7.16.0"
   resolved "https://registry.npmmirror.com/@babel/helper-module-imports/download/@babel/helper-module-imports-7.16.0.tgz"
   integrity sha1-kFOOYLZy7PG0SPX09UM9N+eaPsM=
@@ -1053,7 +1053,7 @@
     "@babel/parser" "^7.16.0"
     "@babel/types" "^7.16.0"
 
-"@babel/traverse@^7.1.0", "@babel/traverse@^7.12.10", "@babel/traverse@^7.13.0", "@babel/traverse@^7.16.0", "@babel/traverse@^7.4.3", "@babel/traverse@^7.4.5":
+"@babel/traverse@^7.1.0", "@babel/traverse@^7.12.10", "@babel/traverse@^7.13.0", "@babel/traverse@^7.16.0", "@babel/traverse@^7.4.3":
   version "7.16.0"
   resolved "https://registry.npmmirror.com/@babel/traverse/download/@babel/traverse-7.16.0.tgz"
   integrity sha1-ll32xr/AqVjB5zkoTTyfpKbjxFs=
@@ -1103,28 +1103,6 @@
   version "3.4.0"
   resolved "https://registry.npmmirror.com/@ctrl/tinycolor/download/@ctrl/tinycolor-3.4.0.tgz"
   integrity sha1-w8WuVDyJfKqcKmhjC+01W+X5mQ8=
-
-"@emotion/is-prop-valid@^0.8.8":
-  version "0.8.8"
-  resolved "https://registry.npmmirror.com/@emotion/is-prop-valid/download/@emotion/is-prop-valid-0.8.8.tgz"
-  integrity sha1-2yixxDaKJZtgqXMR1qlS1P0BrBo=
-  dependencies:
-    "@emotion/memoize" "0.7.4"
-
-"@emotion/memoize@0.7.4":
-  version "0.7.4"
-  resolved "https://registry.npmmirror.com/@emotion/memoize/download/@emotion/memoize-0.7.4.tgz"
-  integrity sha1-Gb8PWvGRSREcQNmLsM+CEZ9dnus=
-
-"@emotion/stylis@^0.8.4":
-  version "0.8.5"
-  resolved "https://registry.npmmirror.com/@emotion/stylis/download/@emotion/stylis-0.8.5.tgz"
-  integrity sha1-3qyzib1u530ef8rMzp4WxcfnjgQ=
-
-"@emotion/unitless@^0.7.4":
-  version "0.7.5"
-  resolved "https://registry.npmmirror.com/@emotion/unitless/download/@emotion/unitless-0.7.5.tgz"
-  integrity sha1-dyESkcGQCnALinjPr9oxYNdpSe0=
 
 "@eslint/eslintrc@^0.4.3":
   version "0.4.3"
@@ -1587,7 +1565,7 @@
   resolved "https://registry.npmmirror.com/@types/history/download/@types/history-4.7.9.tgz"
   integrity sha1-HPttYO84IsWJ8Y5w+LEvmijOhyQ=
 
-"@types/hoist-non-react-statics@*", "@types/hoist-non-react-statics@^3.3.0", "@types/hoist-non-react-statics@^3.3.1":
+"@types/hoist-non-react-statics@^3.3.0", "@types/hoist-non-react-statics@^3.3.1":
   version "3.3.1"
   resolved "https://registry.npmmirror.com/@types/hoist-non-react-statics/download/@types/hoist-non-react-statics-3.3.1.tgz"
   integrity sha1-ESSq/lEYy1kZd66xzqrtEHDrA58=
@@ -1810,15 +1788,6 @@
   version "2.0.1"
   resolved "https://registry.npmmirror.com/@types/stack-utils/download/@types/stack-utils-2.0.1.tgz"
   integrity sha1-IPGClPeX8iCbX2XI47XI6CYdEnw=
-
-"@types/styled-components@^5.1.15":
-  version "5.1.15"
-  resolved "https://registry.npmmirror.com/@types/styled-components/download/@types/styled-components-5.1.15.tgz"
-  integrity sha1-MIVbQKqAs7TkwOQ6SvNm58JG0Ug=
-  dependencies:
-    "@types/hoist-non-react-statics" "*"
-    "@types/react" "*"
-    csstype "^3.0.2"
 
 "@types/unist@*", "@types/unist@^2.0.0", "@types/unist@^2.0.2":
   version "2.0.6"
@@ -2781,21 +2750,6 @@ babel-plugin-polyfill-regenerator@^0.2.3:
   dependencies:
     "@babel/helper-define-polyfill-provider" "^0.2.4"
 
-"babel-plugin-styled-components@>= 1.12.0", babel-plugin-styled-components@^1.13.3:
-  version "1.13.3"
-  resolved "https://registry.npmmirror.com/babel-plugin-styled-components/download/babel-plugin-styled-components-1.13.3.tgz"
-  integrity sha1-Hxyzkn1K+h4yRpXHj2kJAOPQdbw=
-  dependencies:
-    "@babel/helper-annotate-as-pure" "^7.15.4"
-    "@babel/helper-module-imports" "^7.15.4"
-    babel-plugin-syntax-jsx "^6.18.0"
-    lodash "^4.17.11"
-
-babel-plugin-syntax-jsx@^6.18.0:
-  version "6.18.0"
-  resolved "https://registry.npmmirror.com/babel-plugin-syntax-jsx/download/babel-plugin-syntax-jsx-6.18.0.tgz"
-  integrity sha1-CvMqmm4Tyno/1QaeYtew9Y0NiUY=
-
 babel-preset-current-node-syntax@^1.0.0:
   version "1.0.1"
   resolved "https://registry.npmmirror.com/babel-preset-current-node-syntax/download/babel-preset-current-node-syntax-1.0.1.tgz"
@@ -3125,11 +3079,6 @@ camelcase@^6.0.0:
   version "6.2.0"
   resolved "https://registry.npmmirror.com/camelcase/download/camelcase-6.2.0.tgz"
   integrity sha1-kkr4gcnVJaydh/QNlk5c6pgqGAk=
-
-camelize@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/camelize/download/camelize-1.0.0.tgz"
-  integrity sha1-FkpUg+Yw+kMh5a8HAg5TGDGyYJs=
 
 caniuse-lite@^1.0.30000981, caniuse-lite@^1.0.30001109, caniuse-lite@^1.0.30001274:
   version "1.0.30001278"
@@ -3603,11 +3552,6 @@ css-blank-pseudo@^0.1.4:
   dependencies:
     postcss "^7.0.5"
 
-css-color-keywords@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/css-color-keywords/download/css-color-keywords-1.0.0.tgz"
-  integrity sha1-/qJhbcZ2spYmhrOvjb2+GAskTgU=
-
 css-has-pseudo@^0.10.0:
   version "0.10.0"
   resolved "https://registry.npmmirror.com/css-has-pseudo/download/css-has-pseudo-0.10.0.tgz"
@@ -3622,15 +3566,6 @@ css-prefers-color-scheme@^3.1.1:
   integrity sha1-b4MKJxQZnU8NDQu4onkW7WXP8fQ=
   dependencies:
     postcss "^7.0.5"
-
-css-to-react-native@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.npmmirror.com/css-to-react-native/download/css-to-react-native-3.0.0.tgz"
-  integrity sha1-YtvmeAcqgkpom8/uAR/JbgKn11Y=
-  dependencies:
-    camelize "^1.0.0"
-    css-color-keywords "^1.0.0"
-    postcss-value-parser "^4.0.2"
 
 cssdb@^4.4.0:
   version "4.4.0"
@@ -5062,7 +4997,7 @@ hmac-drbg@^1.0.1:
     minimalistic-assert "^1.0.0"
     minimalistic-crypto-utils "^1.0.1"
 
-hoist-non-react-statics@^3.0.0, hoist-non-react-statics@^3.1.0, hoist-non-react-statics@^3.3.0, hoist-non-react-statics@^3.3.2:
+hoist-non-react-statics@^3.1.0, hoist-non-react-statics@^3.3.0, hoist-non-react-statics@^3.3.2:
   version "3.3.2"
   resolved "https://registry.npmmirror.com/hoist-non-react-statics/download/hoist-non-react-statics-3.3.2.tgz"
   integrity sha1-7OCsr3HWLClpwuxZ/v9CpLGoW0U=
@@ -7927,7 +7862,7 @@ postcss-syntax@^0.36.2:
   resolved "https://registry.npmjs.org/postcss-syntax/-/postcss-syntax-0.36.2.tgz"
   integrity sha512-nBRg/i7E3SOHWxF3PpF5WnJM/jQ1YpY9000OaVXlAQj6Zp/kIqJxEDWIZ67tAd7NLuk7zqN4yqe9nc0oNAOs1w==
 
-postcss-value-parser@^4.0.2, postcss-value-parser@^4.1.0:
+postcss-value-parser@^4.1.0:
   version "4.1.0"
   resolved "https://registry.npmmirror.com/postcss-value-parser/download/postcss-value-parser-4.1.0.tgz"
   integrity sha1-RD9qIM7WSBor2k+oUypuVdeJoss=
@@ -9988,22 +9923,6 @@ style-search@^0.1.0:
   resolved "https://registry.npmjs.org/style-search/-/style-search-0.1.0.tgz"
   integrity sha1-eVjHk+R+MuB9K1yv5cC/jhLneQI=
 
-styled-components@^5.3.3:
-  version "5.3.3"
-  resolved "https://registry.npmmirror.com/styled-components/download/styled-components-5.3.3.tgz"
-  integrity sha1-MSo9mlSfRwjw+w7cgp6zS94DJ0M=
-  dependencies:
-    "@babel/helper-module-imports" "^7.0.0"
-    "@babel/traverse" "^7.4.5"
-    "@emotion/is-prop-valid" "^0.8.8"
-    "@emotion/stylis" "^0.8.4"
-    "@emotion/unitless" "^0.7.4"
-    babel-plugin-styled-components ">= 1.12.0"
-    css-to-react-native "^3.0.0"
-    hoist-non-react-statics "^3.0.0"
-    shallowequal "^1.1.0"
-    supports-color "^5.5.0"
-
 stylelint-config-css-modules@^2.2.0:
   version "2.3.0"
   resolved "https://registry.npmjs.org/stylelint-config-css-modules/-/stylelint-config-css-modules-2.3.0.tgz"
@@ -10099,7 +10018,7 @@ supports-color@8.1.1:
   dependencies:
     has-flag "^4.0.0"
 
-supports-color@^5.3.0, supports-color@^5.5.0:
+supports-color@^5.3.0:
   version "5.5.0"
   resolved "https://registry.npmmirror.com/supports-color/download/supports-color-5.5.0.tgz"
   integrity sha1-4uaaRKyHcveKHsCzW2id9lMO/I8=

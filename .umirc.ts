@@ -23,12 +23,4 @@ export default defineConfig({
 
   base: '/time-mgt',
   publicPath: '/micro/time-mgt/',
-  extraBabelPlugins: [
-    [
-      'babel-plugin-styled-components',
-      {
-        namespace: 'time-mgt',
-      },
-    ],
-  ],
 });
