@@ -20,7 +20,6 @@ export default defineConfig({
       },
     },
   },
-
   base: '/time-mgt',
   publicPath: '/micro/time-mgt/',
 });
